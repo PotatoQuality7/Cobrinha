@@ -62,7 +62,7 @@ Efeitos:
 • Duração, e gravidade variarão dependendo da dificuldade.
 • Incluirão:
 	Efeitos Benéficos:
-	• Camera Lenta
+	• Câmera Lenta
 		• Reduz a velocidade de movimento da cobra.
 	• Multiplicador de Pontos
 		• Multiplica os pontos adquiridos ao comer um biscoito por 2.
@@ -76,7 +76,7 @@ Efeitos:
 		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
 
 	Prejudicias:
-	• Camera Rápida
+	• Câmera Rápida
 		• Aumenta a velocidade de movimento da cobra.
 	• Divisor de Pontos
 		• Divide os pontos adquiridos ao comer um biscoito por 2.

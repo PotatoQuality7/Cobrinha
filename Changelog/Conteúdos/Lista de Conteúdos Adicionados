@@ -1,0 +1,19 @@
+Funcionalidades
+_____________________________________________________________
+
+Efeitos:
+• Modificadores benéficos ou prejudiciais do jogo.
+• Inclui:
+	Efeitos Benéficos:
+	• Câmera Lenta
+		• Reduz a velocidade de movimento da cobra.
+	• Portal
+		• Permite entrar numa parede do quadro, e sair pelo lado oposto.
+	• Fantasma
+		• Permite atravessar qualquer entidade danificadora.
+	• Kamikaze
+		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
+	
+	Efeitos Prejudiciais:
+	• Redutor
+		• Reduz x pontos a cada n segundos.
