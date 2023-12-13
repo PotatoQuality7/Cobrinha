@@ -1,0 +1,129 @@
+Funcionalidades
+_____________________________________________________________
+
+Menu:
+• Permitirá a criação, remoção e modificação, e a leitura de um conta.
+• Permitirá a seleção entre os modos Single-Player e Multi-Player.
+• Permitirá a seleção entre os modos Infinito e Campanha.
+• Terá uma enciclopédia sobre as entidades do jogo.
+• Permitirá customização do jogo.
+	• Inclui mudança de cores, dos volumes de música e som.
+• Permitirá o acesso aos replays.
+• Terá um LeaderBoard para poder visualizar os melhores recordes pessoais.
+
+Níveis:
+• Jogador poderá selecionar níveis com características únicas.
+• Design do nível vai variar dependendo da dificuldade selecionada.
+• Níveis serão desbloqueáveis ao longo do progresso.
+
+Boss:
+• Vilão que tentará derrotar o jogador.
+• Aparecerá após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
+• Conterá vida que variará consoante a dificuldade.
+• Terá um conjunto de ataques:
+	• Laser Básico
+		• Corta cobra na posição de impacto.
+		• Não atravessa obstáculos.
+
+	• Laser Perfurador
+		• Herda características do Laser Básico.
+		• Quebra um obstáculo.
+		• Se desintegra após impacto com o obstáculo.
+
+	• Laser Rastreador
+		• Herda características do Laser Básico.
+		• Capaz de desviar e esquivar blocos para atingir o jogador.
+		• Número limite de desvio varia dependendo da dificuldade.
+
+	• Laser Beam
+		• Herda características do Laser Básico.
+		• Ocupa horizontalmente todo quadro ao mesmo tempo.
+		• Desintegra todas entidades impactadas.
+		• Capaz de fazer movimento vertical.
+
+	• Impacto
+		• Causa deslizamento horizontal dos obstáculos presentes no quadro.
+		• Duração varia dependendo da dificuldade.
+		• Obstáculos cortam a cobra na posição de impacto.
+
+	• Os Gêmeos
+		• Cobras gêmeas que nascem no quadro à partir de ovos lançados pelo Boss.
+			• Ovos podem ser destruídos pelo ataque de arremesso da cauda do jogador.
+		• O primeiro gêmeo segue o biscoito.
+			• Consumo do biscoito aumenta o tamanho das duas cobras.
+		• O segundo gêmeo tenta encurralar o jogador.
+		• Vulneráveis aos mesmos tipos de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
+		• A presença de um ou de outro varia dependendo da dificuldade.
+
+
+
+Efeitos:
+• Modificadores benéficos ou prejudiciais do jogo.
+• Duração, e gravidade variarão dependendo da dificuldade.
+• Incluirão:
+	Efeitos Benéficos:
+	• Camera Lenta
+		• Reduz a velocidade de movimento da cobra.
+	• Multiplicador de Pontos
+		• Multiplica os pontos adquiridos ao comer um biscoito por 2.
+	• Pontuador
+		• Aumenta x pontos a cada n segundos.
+	• Portal
+		• Permite entrar numa parede do quadro, e sair pelo lado oposto.
+	• Fantasma
+		• Permite atravessar qualquer entidade danificadora.
+	• Kamikaze
+		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
+
+	Prejudicias:
+	• Camera Rápida
+		• Aumenta a velocidade de movimento da cobra.
+	• Divisor de Pontos
+		• Divide os pontos adquiridos ao comer um biscoito por 2.
+	• Redutor
+		• Reduz x pontos a cada n segundos.
+	• Minas
+		• Gera minas em posições aleatórias no campo.
+	• EDM
+		• Faz com que o quadro alterne entre claro e escuro.
+	• Veneno
+		• Reduz o tamanho da cobra a cada n segundos.
+	• Bug
+		• Move a cobra numa direção aleatória a cada n segundos.
+
+Multi-Player:
+• Permitirá fazer partidas entre jogadores, de forma local ou remota.
+	• Partida local funcionará com teclado compartilhado entre os jogadores.
+	• Partida remota funcionará através do ID.
+
+Replay:
+• Permitirá assistir as melhores performances.
+• Permitirá recuar, avançar, e pausar o replay.
+• Permitirá fazer screenshots.
+
+
+Qualidade de Vida
+_____________________________________________________________
+
+
+Música:
+• Música do Menu
+• Música do Jogo
+• Música dos Níveis
+• Música de Game Over
+• Música da luta contra o Boss
+
+Som:
+• Sons de clique
+• Som do consumo do biscoito
+• Sons de disparo da cauda
+• Sons dos ataques do Boss
+
+Animações:
+• Implementar transições entre as telas.
+• Implementar animação da pausa do jogo.
+
+Outros:
+• Permitir jogar através do joystick.
+
+
