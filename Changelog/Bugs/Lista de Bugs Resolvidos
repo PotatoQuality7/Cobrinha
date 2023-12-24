@@ -1,5 +1,8 @@
-Movimento:
-• Teclas de movimento não bem-detectadas
+Boss:
+• Laser Beam
+	• Causa erro de execução.
 
-Quadro:
-• Quadro tem um deslocação vertical de um bloco
+Efeitos:
+• Temporizador termina quase instantaneamente.
+• Kamikaze
+	• Não funciona.
