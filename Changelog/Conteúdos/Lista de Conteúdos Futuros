@@ -21,30 +21,11 @@ Boss:
 • Aparecerá após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
 • Conterá vida que variará consoante a dificuldade.
 • Terá um conjunto de ataques:
-	• Laser Básico
-		• Corta cobra na posição de impacto.
-		• Não atravessa obstáculos.
-
-	• Laser Perfurador
-		• Herda características do Laser Básico.
-		• Quebra um obstáculo.
-		• Se desintegra após impacto com o obstáculo.
 
 	• Laser Rastreador
 		• Herda características do Laser Básico.
 		• Capaz de desviar e esquivar blocos para atingir o jogador.
 		• Número limite de desvio varia dependendo da dificuldade.
-
-	• Laser Beam
-		• Herda características do Laser Básico.
-		• Ocupa horizontalmente todo quadro ao mesmo tempo.
-		• Desintegra todas entidades impactadas.
-		• Capaz de fazer movimento vertical.
-
-	• Impacto
-		• Causa deslizamento horizontal dos obstáculos presentes no quadro.
-		• Duração varia dependendo da dificuldade.
-		• Obstáculos cortam a cobra na posição de impacto.
 
 	• Os Gêmeos
 		• Cobras gêmeas que nascem no quadro à partir de ovos lançados pelo Boss.
@@ -62,26 +43,16 @@ Efeitos:
 • Duração, e gravidade variarão dependendo da dificuldade.
 • Incluirão:
 	Efeitos Benéficos:
-	• Câmera Lenta
-		• Reduz a velocidade de movimento da cobra.
 	• Multiplicador de Pontos
 		• Multiplica os pontos adquiridos ao comer um biscoito por 2.
 	• Pontuador
 		• Aumenta x pontos a cada n segundos.
-	• Portal
-		• Permite entrar numa parede do quadro, e sair pelo lado oposto.
-	• Fantasma
-		• Permite atravessar qualquer entidade danificadora.
-	• Kamikaze
-		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
 
 	Prejudicias:
 	• Câmera Rápida
 		• Aumenta a velocidade de movimento da cobra.
 	• Divisor de Pontos
 		• Divide os pontos adquiridos ao comer um biscoito por 2.
-	• Redutor
-		• Reduz x pontos a cada n segundos.
 	• Minas
 		• Gera minas em posições aleatórias no campo.
 	• EDM
@@ -105,6 +76,8 @@ Replay:
 Qualidade de Vida
 _____________________________________________________________
 
+Ícones:
+• Desenhar os ícones dos Efeitos
 
 Música:
 • Música do Menu

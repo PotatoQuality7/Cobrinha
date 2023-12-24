@@ -1,7 +1,15 @@
+Boss:
+• Laser Beam
+	• Causa erro de execução
+• Impacto
+	• Não apaga células anteriores
+	• Não desliza de um lado para o outro
+	• Só causa dano na cabeça da cobra
+
 Efeitos:
+• Temporizador termina quase instantaneamente
 • Kamikaze
-	• Elimina todos obstáculos no quadro
-	• Não desativa após impacto
+	• Não funciona
 • Câmera Rápida
 	• Não ativa
 • Redutor
