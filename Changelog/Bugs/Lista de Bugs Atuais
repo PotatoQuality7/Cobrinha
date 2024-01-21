@@ -1,13 +1,11 @@
 Boss:
-• Impacto
-	• Não apaga células anteriores.
-	• Não desliza de um lado para o outro.
-	• Só causa dano na cabeça da cobra.
+• Impacto:
+	• Não ativa.
 
 Efeitos:
-• Kamikaze
-	• Não desativa após impacto.
-• Câmera Rápida
-	• Não ativa.
-• Redutor
+• Todos efeitos ativam de uma só so vez.
+• Redutor:
 	• Reduz pontos de uma só vez.
+
+Cobra:
+• Não dispara a cauda.

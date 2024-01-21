@@ -1,8 +1,5 @@
-Boss:
-• Laser Beam
-	• Causa erro de execução.
-
 Efeitos:
-• Temporizador termina quase instantaneamente.
-• Kamikaze
-	• Não funciona.
+• Kamikaze:
+	• Não desativa após impacto.
+• Câmera Rápida:
+	• Não ativa.

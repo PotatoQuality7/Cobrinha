@@ -10,11 +10,14 @@ Biscoito:
 Obstáculos:
 • Gerados aleatóriamento no quadro
 
+Cobra:
+• Poderá disparar a cauda.
+
 Boss:
-• Vilão que tentará derrotar o jogador.
-• Aparecerá após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
+• Vilão que tenta derrotar o jogador.
+• Aparece após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
 • Conterá vida que variará consoante a dificuldade.
-• Terá um conjunto de ataques:
+• Tem um conjunto de ataques:
 	• Laser Básico
 		• Corta cobra na posição de impacto.
 		• Não atravessa obstáculos.
@@ -37,7 +40,7 @@ Boss:
 
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
-• Duração varia limitada por um temporizador.
+• Duração varia, e é limitada por um temporizador.
 • Inclui:
 	Efeitos Benéficos:
 	• Câmera Lenta
@@ -54,3 +57,8 @@ Efeitos:
 		• Reduz x pontos a cada n segundos.
 
 
+Qualidade de Vida
+_____________________________________________________________
+
+Outros:
+• Botão de reiniciar adicionado
