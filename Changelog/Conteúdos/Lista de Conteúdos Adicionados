@@ -1,0 +1,28 @@
+Cobra:
+• Possibilidade de disparar a cauda para danificar o boss adicionada.
+
+Níveis:
+• Jogador agora pode selecionar níveis com características únicas.
+• Design do nível varia dependendo da dificuldade selecionada.
+
+Boss:
+• Vida adicionada.
+
+Efeitos:
+Efeitos Benéficos:
+	• Pontuador:
+		• Aumenta x pontos a cada n segundos.
+	• Multiplicador de Pontos:
+	    • Multiplica os pontos adquiridos ao comer um biscoito por 2.
+
+Efeitos Prejudiciais:
+	• Divisor de Pontos:
+	    • Divide os pontos adquiridos ao comer um biscoito por 2.
+	• Câmera Rápida:
+	    • Aumenta a velocidade de movimento da cobra.
+	• Minas:
+        • Gera minas em posições aleatórias no campo.
+	• EDM:
+        • Faz com que o quadro alterne entre claro e escuro
+	• Veneno:
+        • Reduz o tamanho da cobra a cada n segundos.

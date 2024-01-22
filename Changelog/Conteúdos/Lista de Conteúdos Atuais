@@ -1,39 +1,41 @@
 Funcionalidades
 _____________________________________________________________
 
-Movimento:
-• Cobra se move através das teclas WASD
+Cobra:
+• Pode disparar a cauda que danifica o boss.
+• Cobra se move através das teclas WASD.
 
 Biscoito:
-• Cobra pode comer o biscoito e aumentar de tamanho
+• Cobra pode comer o biscoito e aumentar de tamanho.
 
 Obstáculos:
-• Gerados aleatóriamento no quadro
+• Gerados aleatóriamento no quadro.
 
-Cobra:
-• Poderá disparar a cauda.
+Níveis:
+• Jogador pode selecionar níveis com características únicas.
+• Design do nível varia dependendo da dificuldade selecionada.
 
 Boss:
 • Vilão que tenta derrotar o jogador.
 • Aparece após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
-• Conterá vida que variará consoante a dificuldade.
+• Contém vida.
 • Tem um conjunto de ataques:
-	• Laser Básico
+	• Laser Básico:
 		• Corta cobra na posição de impacto.
 		• Não atravessa obstáculos.
 
-	• Laser Perfurador
+	• Laser Perfurador:
 		• Herda características do Laser Básico.
 		• Quebra obstáculos.
 		• Não se desintegra após impacto com o obstáculo.
 
-	• Laser Beam
+	• Laser Beam:
 		• Herda características do Laser Básico.
 		• Ocupa horizontalmente todo quadro ao mesmo tempo.
 		• Desintegra todas entidades impactadas.
 		• Capaz de fazer movimento vertical.
 
-	• Impacto
+	• Impacto:
 		• Causa deslizamento horizontal dos obstáculos presentes no quadro.
 		• Duração varia dependendo da dificuldade.
 		• Obstáculos cortam a cobra na posição de impacto.
@@ -43,22 +45,38 @@ Efeitos:
 • Duração varia, e é limitada por um temporizador.
 • Inclui:
 	Efeitos Benéficos:
-	• Câmera Lenta
+	• Pontuador:
+		• Aumenta x pontos a cada n segundos.
+	• Multiplicador de Pontos:
+        • Multiplica os pontos adquiridos ao comer um biscoito por 2.
+	• Câmera Lenta:
 		• Reduz a velocidade de movimento da cobra.
-	• Portal
+	• Portal:
 		• Permite entrar numa parede do quadro, e sair pelo lado oposto.
-	• Fantasma
+	• Fantasma:
 		• Permite atravessar qualquer entidade danificadora.
-	• Kamikaze
+	• Kamikaze:
 		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
 	
 	Efeitos Prejudiciais:
-	• Redutor
+	• Redutor:
 		• Reduz x pontos a cada n segundos.
+	• Divisor de Pontos:
+       • Divide os pontos adquiridos ao comer um biscoito por 2.
+	• Câmera Rápida:
+        • Aumenta a velocidade de movimento da cobra.
+	• Minas:
+        • Gera minas em posições aleatórias no campo.
+	• EDM:
+        • Faz com que o quadro alterne entre claro e escuro
+	• Veneno:
+        • Reduz o tamanho da cobra a cada n segundos.
 
 
 Qualidade de Vida
 _____________________________________________________________
 
 Outros:
-• Botão de reiniciar adicionado
+
+• Permite pausar o jogo.
+• Permite reiniciar o jogo.

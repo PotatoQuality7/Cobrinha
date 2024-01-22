@@ -1,11 +1,27 @@
-Boss:
-• Impacto:
-	• Não ativa.
+Níveis:
+• Boss não aparece no nível 7.
 
 Efeitos:
-• Todos efeitos ativam de uma só so vez.
-• Redutor:
-	• Reduz pontos de uma só vez.
+Efeitos Benéficos:
+• Pontuador:
+	• Aumenta os pontos, mas não atualiza no quadro.
+• Multiplicador de Pontos:
+    • Não ativa.
+• Câmera Lenta:
+    • Atrasa o jogo todo, não só a cobra.
+• Kamikaze:
+	• Colisão com um obstáculo durante o ataque "Impacto" do Boss, causa a eliminação de todos obstáculos no quadro.
+	• Um dos segmentos da cobra continua com a cor da Cobra Kamikaze após impacto.
 
-Cobra:
-• Não dispara a cauda.
+Efeitos Prejudiciais:
+• Redutor:
+	• Reduz os pontos, mas não atualiza no quadro.
+• Divisor de Pontos:
+    • Não ativa.
+• Câmera Rápida:
+    • Acelera o jogo todo, não só a cobra.
+• Minas:
+    • Só gera uma mina.
+	• Mina não causa dano à cobra.
+• EDM:
+    • Cabeça da cobra continua visível.

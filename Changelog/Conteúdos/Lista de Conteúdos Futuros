@@ -12,8 +12,6 @@ Menu:
 • Terá um LeaderBoard para poder visualizar os melhores recordes pessoais.
 
 Níveis:
-• Jogador poderá selecionar níveis com características únicas.
-• Design do nível vai variar dependendo da dificuldade selecionada.
 • Níveis serão desbloqueáveis ao longo do progresso.
 
 Boss:
@@ -21,7 +19,6 @@ Boss:
 • Aparecerá após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
 • Conterá vida que variará consoante a dificuldade.
 • Terá um conjunto de ataques:
-
 	• Laser Rastreador
 		• Herda características do Laser Básico.
 		• Capaz de desviar e esquivar blocos para atingir o jogador.
@@ -36,29 +33,11 @@ Boss:
 		• Vulneráveis aos mesmos tipos de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
 		• A presença de um ou de outro varia dependendo da dificuldade.
 
-
-
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
 • Duração, e gravidade variarão dependendo da dificuldade.
 • Incluirão:
-	Efeitos Benéficos:
-	• Multiplicador de Pontos
-		• Multiplica os pontos adquiridos ao comer um biscoito por 2.
-	• Pontuador
-		• Aumenta x pontos a cada n segundos.
-
-	Prejudicias:
-	• Câmera Rápida
-		• Aumenta a velocidade de movimento da cobra.
-	• Divisor de Pontos
-		• Divide os pontos adquiridos ao comer um biscoito por 2.
-	• Minas
-		• Gera minas em posições aleatórias no campo.
-	• EDM
-		• Faz com que o quadro alterne entre claro e escuro.
-	• Veneno
-		• Reduz o tamanho da cobra a cada n segundos.
+	Efeitos Prejudiciais:
 	• Bug
 		• Move a cobra numa direção aleatória a cada n segundos.
 
