@@ -2,7 +2,7 @@ Funcionalidades
 _____________________________________________________________
 
 Cobra:
-• Pode disparar a cauda que danifica o boss.
+• Pode disparar a cauda para danificar o boss.
 • Cobra se move através das teclas WASD.
 
 Biscoito:
@@ -40,43 +40,49 @@ Boss:
 		• Duração varia dependendo da dificuldade.
 		• Obstáculos cortam a cobra na posição de impacto.
 
+    • Os Gêmeos:
+        • Cobras gêmeas que nascem no quadro à partir de ovos lançados pelo Boss.
+            • Ovos podem ser destruídos pelo ataque de arremesso da cauda do jogador.
+        • O primeiro gêmeo segue o biscoito.
+            • Consumo do biscoito aumenta o tamanho do gêmeo.
+        • Vulnerável ao mesmo tipo de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
+
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
 • Duração varia, e é limitada por um temporizador.
 • Inclui:
-	Efeitos Benéficos:
-	• Pontuador:
-		• Aumenta x pontos a cada n segundos.
-	• Multiplicador de Pontos:
-        • Multiplica os pontos adquiridos ao comer um biscoito por 2.
-	• Câmera Lenta:
-		• Reduz a velocidade de movimento da cobra.
-	• Portal:
-		• Permite entrar numa parede do quadro, e sair pelo lado oposto.
-	• Fantasma:
-		• Permite atravessar qualquer entidade danificadora.
-	• Kamikaze:
-		• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
+	• Efeitos Benéficos:
+		• Pontuador:
+			• Aumenta x pontos a cada n segundos.
+		• Multiplicador de Pontos:
+	        • Multiplica os pontos adquiridos ao comer um biscoito por 2.
+		• Câmera Lenta:
+			• Reduz a velocidade de movimento da cobra.
+		• Portal:
+			• Permite entrar numa parede do quadro, e sair pelo lado oposto.
+		• Fantasma:
+			• Permite atravessar qualquer entidade danificadora.
+		• Kamikaze:
+			• Permite com que o jogador desintegre um grupo de obstáculos após impacto.
 	
-	Efeitos Prejudiciais:
-	• Redutor:
-		• Reduz x pontos a cada n segundos.
-	• Divisor de Pontos:
-       • Divide os pontos adquiridos ao comer um biscoito por 2.
-	• Câmera Rápida:
-        • Aumenta a velocidade de movimento da cobra.
-	• Minas:
-        • Gera minas em posições aleatórias no campo.
-	• EDM:
-        • Faz com que o quadro alterne entre claro e escuro
-	• Veneno:
-        • Reduz o tamanho da cobra a cada n segundos.
+	• Efeitos Prejudiciais:
+		• Redutor:
+			• Reduz x pontos a cada n segundos.
+		• Divisor de Pontos:
+	       • Divide os pontos adquiridos ao comer um biscoito por 2.
+		• Câmera Rápida:
+	        • Aumenta a velocidade de movimento da cobra.
+		• Minas:
+	        • Gera minas em posições aleatórias no campo.
+		• EDM:
+	        • Faz com que o quadro alterne entre claro e escuro
+		• Veneno:
+	        • Reduz o tamanho da cobra a cada n segundos.
 
 
 Qualidade de Vida
 _____________________________________________________________
 
 Outros:
-
 • Permite pausar o jogo.
 • Permite reiniciar o jogo.

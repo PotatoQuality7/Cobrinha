@@ -19,32 +19,27 @@ Boss:
 • Aparecerá após atingir um certo número de pontos no Modo Infinito ou chegar a um certo nível no Modo Campanha.
 • Conterá vida que variará consoante a dificuldade.
 • Terá um conjunto de ataques:
-	• Laser Rastreador
-		• Herda características do Laser Básico.
+	• Laser Rastreador:
+		• Herdará as características do Laser Básico.
 		• Capaz de desviar e esquivar blocos para atingir o jogador.
-		• Número limite de desvio varia dependendo da dificuldade.
+		• Número limite de desvio variará dependendo da dificuldade.
 
-	• Os Gêmeos
-		• Cobras gêmeas que nascem no quadro à partir de ovos lançados pelo Boss.
-			• Ovos podem ser destruídos pelo ataque de arremesso da cauda do jogador.
-		• O primeiro gêmeo segue o biscoito.
-			• Consumo do biscoito aumenta o tamanho das duas cobras.
-		• O segundo gêmeo tenta encurralar o jogador.
-		• Vulneráveis aos mesmos tipos de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
-		• A presença de um ou de outro varia dependendo da dificuldade.
+	• Refletidor:
+		• Retornará o ataque de disparo da cauda da cobra.
+		• Ataque empurará a cobra até o próximo obstáculo, ou parede.
 
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
 • Duração, e gravidade variarão dependendo da dificuldade.
 • Incluirão:
 	Efeitos Prejudiciais:
-	• Bug
+	• Bug:
 		• Move a cobra numa direção aleatória a cada n segundos.
 
 Multi-Player:
 • Permitirá fazer partidas entre jogadores, de forma local ou remota.
 	• Partida local funcionará com teclado compartilhado entre os jogadores.
-	• Partida remota funcionará através do ID.
+	• Partida remota funcionará através do ID e conexão a uma rede de computadores.
 
 Replay:
 • Permitirá assistir as melhores performances.

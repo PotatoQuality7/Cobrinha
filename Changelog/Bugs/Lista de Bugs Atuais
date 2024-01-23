@@ -1,27 +1,45 @@
+Cobra:
+• Cobra impedida de disparar a cauda.
+• Cobra pára de se mover de repente.
+
 Níveis:
 • Boss não aparece no nível 7.
 
-Efeitos:
-Efeitos Benéficos:
-• Pontuador:
-	• Aumenta os pontos, mas não atualiza no quadro.
-• Multiplicador de Pontos:
-    • Não ativa.
-• Câmera Lenta:
-    • Atrasa o jogo todo, não só a cobra.
-• Kamikaze:
-	• Colisão com um obstáculo durante o ataque "Impacto" do Boss, causa a eliminação de todos obstáculos no quadro.
-	• Um dos segmentos da cobra continua com a cor da Cobra Kamikaze após impacto.
+Boss:
+• Número de ataques incrementado antes de terminar o ataque.
+• Laser Perfurador:
+	• Perfura, mas não destrói os obstáculos.
+• Laser Beam:
+	• Área de efeito não combina com a animação.
+• Os Gêmeos:
+	• Aparecem nos níveis.
 
-Efeitos Prejudiciais:
-• Redutor:
-	• Reduz os pontos, mas não atualiza no quadro.
-• Divisor de Pontos:
-    • Não ativa.
-• Câmera Rápida:
-    • Acelera o jogo todo, não só a cobra.
-• Minas:
-    • Só gera uma mina.
-	• Mina não causa dano à cobra.
-• EDM:
-    • Cabeça da cobra continua visível.
+Efeitos:
+• Ao esgotar, o temporizador transborda a barra.
+• Efeitos Benéficos:
+	• Pontuador:
+		• Aumenta os pontos, mas não atualiza no quadro.
+	• Multiplicador de Pontos:
+	    • Não ativa.
+	• Câmera Lenta:
+	    • Atrasa o jogo todo, não só a cobra.
+	• Portal:
+		• Não funciona.
+	• Fantasma:
+		• Não funciona.
+	• Kamikaze:
+		• Colisão com um obstáculo durante o ataque "Impacto" do Boss, causa a eliminação de obstáculos não adjacentes.
+		• Um dos segmentos da cobra continua com a cor da Cobra Kamikaze após impacto.
+
+• Efeitos Prejudiciais:
+	• Redutor:
+		• Reduz os pontos, mas não atualiza no quadro.
+	• Divisor de Pontos:
+	    • Não ativa.
+	• Câmera Rápida:
+	    • Acelera o jogo todo, não só a cobra.
+	• Minas:
+		• Mina leva muito tempo para explodir.
+
+Outros:
+• Jogo impedido de ser pausado.

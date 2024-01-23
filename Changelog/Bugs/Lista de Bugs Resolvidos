@@ -1,13 +1,4 @@
-Boss:
-• Impacto:
-	• Não ativa.
-    • Não apaga células anteriores.
-    • Não desliza de um lado para o outro.
-    • Só causa dano na cabeça da cobra.
-
 Efeitos:
-• Redutor:
-	• Reduz pontos de uma só vez.
-
-Cobra:
-• Não dispara a cauda.
+• Efeitos Prejudiciais:
+	• EDM:
+		• Cabeça da cobra permitida continuar visível.
