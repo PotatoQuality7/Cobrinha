@@ -21,12 +21,11 @@ Boss:
 • Terá um conjunto de ataques:
 	• Laser Rastreador:
 		• Herdará as características do Laser Básico.
-		• Capaz de desviar e esquivar blocos para atingir o jogador.
+		• Será capaz de desviar e esquivar blocos para atingir o jogador.
 		• Número limite de desvio variará dependendo da dificuldade.
 
-	• Refletidor:
-		• Retornará o ataque de disparo da cauda da cobra.
-		• Ataque empurará a cobra até o próximo obstáculo, ou parede.
+    • Os Gêmeos
+        • O segundo gêmeo seguirá o biscoito.
 
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
@@ -34,7 +33,7 @@ Efeitos:
 • Incluirão:
 	Efeitos Prejudiciais:
 	• Bug:
-		• Move a cobra numa direção aleatória a cada n segundos.
+		• Moverá a cobra numa direção aleatória a cada n segundos.
 
 Multi-Player:
 • Permitirá fazer partidas entre jogadores, de forma local ou remota.
@@ -52,6 +51,7 @@ _____________________________________________________________
 
 Ícones:
 • Desenhar os ícones dos Efeitos
+• Desenhar os ícones dos botões.
 
 Música:
 • Música do Menu

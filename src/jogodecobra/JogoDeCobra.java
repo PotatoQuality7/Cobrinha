@@ -3,8 +3,10 @@ package jogodecobra;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -19,51 +21,56 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class JogoDeCobra extends JFrame {
-        
+public class JogoDeCobra extends JFrame implements KeyListener {
+
     public JogoDeCobra() {
         setTitle("Desenhos");
         setSize(1260,1260);
         setVisible(true);
         setBackground(fundo_cor);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        addKeyListener(this);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(JogoDeCobra.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }    
     
     public JButton b, proximoNivel, sair, reiniciarButton;
     public ImageIcon icon;
     public JLabel efeitoImg;
     public JFrame frame;
-    public JPanel panel;
-    public JTextField text;
 
     public String[] alternativa = new String[3];
-    public String pergunta, boss_laser_tipo, tempStr, dificuldade;
+    public String pergunta, boss_ataque_tipo, tempStr, dificuldade;
     public byte[][] cobra_x = new byte[4][301];
     public byte[][] cobra_y = new byte[4][301];
     public boolean[][] cobra, rival, cobra_caida, escolha, livre, obstaculo_movido;
     public short[] cobra_tamanho;
-    boolean[][] boss_laser;
+    boolean[][] boss_ataque;
     public byte[][] obstaculo_direcao;
-    public int i, i2, j, j2, sco, tempInt;
+    public int i, i2, j, j2, sco, tempInt, c, inicio, fim;
     public char cobra_tiro_direcao, tempChr;
-    public short boss_turbina_y, boss_turbina_x, boss_laser_x, boss_laser_y, boss_laser_offset_y, atraso_boss_movimento, atraso_boss_laser, boss_laser_beam_length, boss_movimento_timer, boss_vida_alpha, cobra_tiro_alpha, boss_x, boss_x2, boss_y, boss_y2;
+    public short boss_turbina_y, boss_turbina_x, boss_ataque_x, boss_ataque_y, boss_ataque_offset_y, atraso_boss_movimento, atraso_boss_ataque, boss_ataque_beam_length, boss_movimento_timer, boss_vida_alpha, cobra_tiro_alpha, boss_x, boss_x2, boss_y, boss_y2, boss_ataque_refletor_ponto;
     public short x, y, x2, y2, quadro_x, quadro_y, comp, comp2;
-    public byte larg, width, height, biscoito_x, biscoito_y, boss_vida, boss_vida_limite, cobra_tiro_dano, biscoitos_comidos, num_jogadores; 
-    public short atraso, rival_tamanho, num_tiros, timer_perguntas, timer_resposta, timer_barra_efeito, timer_minas, alpha, boss_laser_count, boss_laser_timer, tempShrt;
-    public byte nivel, numero, efeito, resposta, boss_direcao, loop, num_grupos, linha1, linha2, cobra_tiro_y, cobra_tiro_x, alvo_y, alvo_x;
-    public boolean boss_movimento_iniciado, gerado_perguntas, feito, noturno, noturnado, boss, boss_derrotado, boss_impacto, biscoito_destruido, lasado, obstaculado, interromper_boss_movimento, interromper_boss_laser, apagar, invalido, reagendar_boss_movimento, reagendar_boss_laser;
-    public boolean cobra_tiro_disparado, reiniciar, envenenado, cobra_movimento_iniciado, gerado_obstaculos;
+    public byte larg, width, height, biscoito_x, biscoito_y, boss_vida, boss_vida_limite, cobra_tiro_dano, biscoitos_comidos, num_jogadores;  
+    public short atraso, rival_tamanho, num_tiros, timer_perguntas, timer_resposta, timer_barra_efeito, timer_minas, alpha, boss_ataque_count, boss_ataque_timer, boss_ataque_timer_alvo, tempShrt;
+    public byte nivel, numero, efeito, resposta, boss_direcao, loop, num_grupos, linha1, linha2, cobra_tiro_y, cobra_tiro_x, alvo_y, alvo_x, num_clicks;
+    public boolean boss_movimento_iniciado, boss_ataque_refletor, gerado_perguntas, feito, noturno, noturnado, boss, boss_derrotado, boss_impacto, biscoito_destruido, lasado, obstaculado, interromper_boss_movimento, interromper_boss_ataque, apagar, invalido, reagendar_boss_movimento, reagendar_boss_ataque;
+    public boolean cobra_tiro_disparado, reiniciar, envenenado, cobra_movimento_iniciado, gerado_obstaculos, cobra_empurrada, cobra_presa;
     public float duplicador, boss_impacto_velocidade;
     public Color fundo_cor = Color.black;
-    public Color boss_laser_simples_cor = Color.red;
-    public Color boss_laser_perfurador_cor = new Color(255,255,127);
-    public Color boss_laser_refletidor_cor = Color.orange;
-    public Color boss_laser_beam_cor1 = Color.white;
-    public Color boss_laser_beam_cor2 = new Color(255,255,127);
+    public Color cobra_cor = new Color(0,255,160);
+    public Color boss_ataque_laser_cor = Color.red;
+    public Color boss_ataque_perfurador_cor = new Color(255,255,127);
+    //public Color boss_ataque_refletidor_cor = Color.orange;
+    public Color boss_ataque_refletor_cor1 = Color.orange;
+    public Color boss_ataque_refletor_cor2 = Color.white;
+    public Color boss_ataque_beam_cor1 = Color.white;
+    public Color boss_ataque_beam_cor2 = new Color(255,255,127);
     public Color cobra_tiro_cor = new Color(185,170,227);
     public Color obstaculo_cor = Color.red;
     public boolean[][] obstaculo;
@@ -84,6 +91,14 @@ public class JogoDeCobra extends JFrame {
     public void receberInformacoes(String dificuldade, byte nivel) {
         this.dificuldade = dificuldade;
         this.nivel = nivel;
+    }
+    
+    public void receberInformacoes(Graphics g, byte nivel, short quadro_y, short quadro_x) {
+        this.nivel = nivel;
+        this.quadro_y = quadro_y;
+        this.quadro_x = quadro_x;
+        g.setColor(Color.green);
+        g.fillRect(quadro_x,quadro_y,200,200);    
     }
     
     public void Perguntas(byte numero) {
@@ -145,9 +160,9 @@ public class JogoDeCobra extends JFrame {
 
         switch (efeito) {
             case 1: sco += 200; break;
-            case 2: duplicador = 2; break;
+            case 2: duplicador = 2; break;//jump
             case 3: atraso *= 2; break; //lentidao
-            case 4: {//jump
+            case 4: {
                     if (y == 0)
                         cobra_y[0][0] = height;
                      else
@@ -233,6 +248,40 @@ public class JogoDeCobra extends JFrame {
             }
             t = 32;
         }
+        /*cobra_tamanho[0] = 7;
+        c = cobra_tamanho[0];
+        x2 = 41;
+        for (i = 1; i <= 5; i++) {
+            cobra_y[0][i] = (byte) (5+i);
+            cobra_x[0][i] = (byte)(x2);
+        }
+        for (j = 1; j <= 4; j++) {
+            cobra_y[0][5+j] = 10;
+            cobra_x[0][5+j] = (byte)(x2+j);
+        }
+        for (i = 1; i <= 26; i++) {
+            cobra_y[0][9+i] = (byte)(10+i);
+            cobra_x[0][9+i] = (byte)(x2+4);
+        }
+        for (i = 1; i <= c; i++) {
+            System.out.println(i+": cobra_y: "+cobra_y[0][i]+", cobra_x: "+cobra_x[0][i]);
+            y = cobra_y[0][i]; x = cobra_x[0][i];
+            livre[y][x] = false;
+            cobra[y][x] = true;
+            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+        }
+        
+        cobra_empurrada = true;
+        sco = 600;
+        boss_ataque_tipo = "refletor";
+        boss_ataque_refletor = true;
+        boss_ataque_refletor_ponto = (short) c;
+        c = boss_ataque_refletor_ponto;
+        boss_ataque_y = cobra_y[0][c];
+        y = cobra_y[0][c]; x = cobra_x[0][c];
+        g.setColor(Color.pink);
+        g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+        */
     }
     
     public void iniciarRival(Graphics g, Color rival_cor) {
@@ -289,15 +338,26 @@ public class JogoDeCobra extends JFrame {
         }
     }
     public void cobraTiro(Graphics g) {
-        
-        System.out.println("cobra_y[0]: "+cobra_y[0][1]+", cobra_x[0]: "+cobra_x[0][1]);
+        //System.out.println("cobra_y[0]: "+cobra_y[0][1]+", cobra_x[0]: "+cobra_x[0][1]);
         System.out.println("tiro_y: "+cobra_tiro_y+", tiro_x: "+cobra_tiro_x);
+        if (width-10 <= cobra_tiro_x && (boss_y-quadro_y)/11 <= cobra_tiro_y && cobra_tiro_y <= (boss_y2-quadro_y)/11 && cobra_tiro_disparado == true) {
+            boss_ataque_refletor = true;
+            interromper_boss_movimento = true;
+            g.setColor(boss_ataque_refletor_cor1);
+            g.fillRect(boss_x-20,boss_y,5,60);
+            if (cobra_tiro_x == (boss_x-quadro_x-20)/11) {
+                cobra_tiro_disparado = false;
+                boss_ataque_tipo = "refletor";
+                boss_ataque_y = cobra_tiro_y;
+                boss_ataque_x = cobra_tiro_x--;
+            }
+        }
         y = cobra_tiro_y; x = cobra_tiro_x;
         g.setColor(fundo_cor);
-        if (x != 62 && x != 63)
+        if (x != 62 && x != 63)//barra de vida
             g.fillRect(quadro_x+((cobra_tiro_x-1)*11),quadro_y+((cobra_tiro_y-1)*11),11,11);
         if (0 < y && y <= height && 0 < x && x <= width)
-            livre[y][x] = true;
+            livre[y][x] = true;        
         switch (cobra_tiro_direcao) {
              case 119 -> cobra_tiro_y--;//w
              case 97 -> cobra_tiro_x--;//a
@@ -311,7 +371,7 @@ public class JogoDeCobra extends JFrame {
                cobra_tiro_dano += boss_vida - cobra_tiro_dano;
             byte c = (byte)(boss_vida_limite-boss_vida);
             g.setColor(new Color(61,68,179));
-            for (int i = c; i <= c+cobra_tiro_dano; i++) {
+            for (i = c; i <= c+cobra_tiro_dano; i++) {
                  g.fillRect(boss_x2+48,221+(i*6),14,4);
             }
             System.out.println("Danooooooooooooooooo: "+cobra_tiro_dano);
@@ -319,7 +379,7 @@ public class JogoDeCobra extends JFrame {
             cobra_tiro_disparado = false; }
          else/*
            if (0 < y && y <= height && 0 < x && x <= width)
-               if (obstaculo[y][x] == true || (boss_laser[y][x] == true && !boss_laser_tipo.equals("simples"))) {
+               if (obstaculo[y][x] == true || (boss_ataque[y][x] == true && !boss_ataque_tipo.equals("laser"))) {
                    cobra_tiro_disparado = false;
                }
             else*/
@@ -347,10 +407,100 @@ public class JogoDeCobra extends JFrame {
                    biscoito_destruido = true;
         }
     }
+    
+    public void empurrarCobra(Graphics g) {
+        if (cobra_presa == false) {
+            c = boss_ataque_refletor_ponto;
+            tempShrt = (byte) c;
+            y = cobra_y[0][c];
+            System.out.println("cobra_y: "+c);
+            /*do {
+            } while (cobra_y[0][++tempShrt] == cobra_y[0][c] && tempShrt <= cobra_tamanho[0]);
+            System.out.println("cobra_y: "+tempShrt);
+            g.setColor(fundo_cor);
+            for (i = 1; i <= cobra_tamanho[0]; i++) {
+                y = cobra_y[0][i]; x = cobra_x[0][i];
+                cobra[y][x] = false;
+                livre[y][x] = true;
+                g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                if (i >= tempShrt-1) {
+                    cobra_y[0][i] += +-1;
+                    cobra_x[0][i] = (byte)(cobra_x[0][i-1]);
+                }
+                else
+                  cobra_x[0][i]--;
+            }
+            g.setColor(cobra_cor);
+            for (i = 1; i <= cobra_tamanho[0]; i++) {
+                y = cobra_y[0][i]; x = cobra_x[0][i];
+                cobra[y][x] = true;
+                livre[y][x] = false;
+                g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                if (x == 1) {
+                    cobra_presa = true;
+                    boss_ataque_timer_alvo = 0;
+                }
+            }*/
+            //refactor com cobra[][] retorna valor
+            if (cobra_x[0][c-1]+1 == cobra_x[0][c] || cobra_x[0][c+1]+1 == cobra_x[0][c]) {
+                i2 = cobra_y[0][c-1]+1 > cobra_y[0][c]? -1 : 1;
+                do {tempShrt += i2;
+                } while (cobra_y[0][tempShrt] == cobra_y[0][c] && tempShrt <= cobra_tamanho[0] && tempShrt > 0);
+                tempShrt -= i2;
+            }
+            g.setColor(fundo_cor);
+            x2 = cobra_x[0][c];
+            for (j = 1; j <= 2; j++) {
+                fim = j == 1? c : c-1;
+                i = j == 1? cobra_tamanho[0]+1 : 0;
+                i2 = j == 1? -1 : 1;
+                do {
+                    i += i2;
+                    y = cobra_y[0][i]; x = cobra_x[0][i];
+                    cobra[y][x] = false;
+                    livre[y][x] = true;
+                    g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                    //refactor range
+                    if (((i > c && cobra_x[0][c+1]+1 == x2) || (i < c && cobra_x[0][c-1]+1 == x2)) || abs(c-i) <= 1) {
+                        if ((i < tempShrt && i >= c-1) || (i > tempShrt && i <= c-1) || (abs(c-i) <= 1 && x == x2)) 
+                            cobra_x[0][i]--;
+                        else
+                          cobra_y[0][i] += i > c? (byte) 1 : -1;
+                    }
+                    else {
+                        cobra_y[0][i] = i > c? cobra_y[0][i-1] : cobra_y[0][i+1];
+                        cobra_x[0][i] = i > c? cobra_x[0][i-1] : cobra_x[0][i+1];
+                    }
+                } while (i != fim);
+            }
+            y = cobra_y[0][c]; x = cobra_x[0][c];
+            cobra[y][x+1] = false;
+            y = cobra_y[0][1]; x = cobra_x[0][1];
+            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+            if (x == 1) {
+                cobra_presa = true;
+                boss_ataque_timer_alvo = 0;
+            }
+            g.setColor(cobra_cor);
+            for (i = 1; i <= cobra_tamanho[0]; i++) {
+                y = cobra_y[0][i]; x = cobra_x[0][i];
+                cobra[y][x] = true;
+                livre[y][x] = false;
+                g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+            }
+        }
+        else
+          if (num_clicks >= 15) {
+              cobra_empurrada = false;
+              cobra_presa = false;
+              num_clicks = 0;
+          }
+    }
+    
     public void moverObstaculos(Graphics g) {
         if (boss_impacto == false) {
-            for (int i = 1; i <= height; i++) {
-                for (int j = 1; j <= width; j++) {
+            for (i = 1; i <= height; i++) {
+                for (j = 1; j <= width; j++) {
                     if (obstaculo[i][j] == true && obstaculo_movido[i][j] == false) {
                         obstaculo[i][j] = false;
                         livre[i][j] = true;
@@ -358,41 +508,45 @@ public class JogoDeCobra extends JFrame {
                         g.fillRect(quadro_x+((j-1)*11),quadro_y+((i-1)*11),11,11);
                         g.setColor(obstaculo_cor);
                         switch (obstaculo_direcao[i][j]) {
-                            case 1: obstaculo[i][j-1] = true;
-                                    livre[i][j-1] = false;
-                                    obstaculo_movido[i][j-1] = true;
-                                    g.fillRect(quadro_x+((j-2)*11),quadro_y+((i-1)*11),11,11);
-                                    obstaculo_direcao[i][j-1] = obstaculo_direcao[i][j];
-                                    obstaculo_direcao[i][j-1] = j == 8? 2 : (byte)(1);
-                                    break;
-                            case 2: obstaculo[i][j+1] = true;
-                                    livre[i][j+1] = false;
-                                    obstaculo_movido[i][j+1] = true;
-                                    g.fillRect(quadro_x+((j)*11),quadro_y+((i-1)*11),11,11);
-                                    obstaculo_direcao[i][j+1] = obstaculo_direcao[i][j];
-                                    obstaculo_direcao[i][j+1] = j == 37? 1 : (byte)(2);
-                                    break;
-                            case 3: obstaculo[i-1][j] = true;
-                                    livre[i-1][j] = false;
-                                    obstaculo_movido[i-1][j] = true;
-                                    g.fillRect(quadro_x+((j-1)*11),quadro_y+((i-2)*11),11,11);
-                                    obstaculo_direcao[i-1][j] = obstaculo_direcao[i][j];
-                                    obstaculo_direcao[i-1][j] = i == 3? 4 : (byte)(3);
-                                    break;
-                            case 4: obstaculo[i+1][j] = true;
-                                    livre[i+1][j] = false;
-                                    obstaculo_movido[i+1][j] = true;
-                                    g.fillRect(quadro_x+((j-1)*11),quadro_y+((i)*11),11,11);
-                                    obstaculo_direcao[i+1][j] = obstaculo_direcao[i][j];
-                                    obstaculo_direcao[i+1][j] = i == 34? 3 : (byte)(4);
-                                    break;
+                            case 1 -> {
+                                obstaculo[i][j-1] = true;
+                                livre[i][j-1] = false;
+                                obstaculo_movido[i][j-1] = true;
+                                g.fillRect(quadro_x+((j-2)*11),quadro_y+((i-1)*11),11,11);
+                                obstaculo_direcao[i][j-1] = obstaculo_direcao[i][j];
+                                obstaculo_direcao[i][j-1] = j == 8? 2 : (byte)(1);
+                            }
+                            case 2 -> {
+                                obstaculo[i][j+1] = true;
+                                livre[i][j+1] = false;
+                                obstaculo_movido[i][j+1] = true;
+                                g.fillRect(quadro_x+((j)*11),quadro_y+((i-1)*11),11,11);
+                                obstaculo_direcao[i][j+1] = obstaculo_direcao[i][j];
+                                obstaculo_direcao[i][j+1] = j == 37? 1 : (byte)(2);
+                            }
+                            case 3 -> {
+                                obstaculo[i-1][j] = true;
+                                livre[i-1][j] = false;
+                                obstaculo_movido[i-1][j] = true;
+                                g.fillRect(quadro_x+((j-1)*11),quadro_y+((i-2)*11),11,11);
+                                obstaculo_direcao[i-1][j] = obstaculo_direcao[i][j];
+                                obstaculo_direcao[i-1][j] = i == 3? 4 : (byte)(3);
+                            }
+                            case 4 -> {
+                                obstaculo[i+1][j] = true;
+                                livre[i+1][j] = false;
+                                obstaculo_movido[i+1][j] = true;
+                                g.fillRect(quadro_x+((j-1)*11),quadro_y+((i)*11),11,11);
+                                obstaculo_direcao[i+1][j] = obstaculo_direcao[i][j];
+                                obstaculo_direcao[i+1][j] = i == 34? 3 : (byte)(4);
+                            }
                         }
                         obstaculo_direcao[i][j] = 0;
                     }
                 }
             }
-            for (int i = 1; i <= height; i++)
-                for (int j = 1; j <= width; j++) {
+            for (i = 1; i <= height; i++)
+                for (j = 1; j <= width; j++) {
                     if (obstaculo[i][j] == true) {
                        if (cobra_caida[i][j] == true)
                            cobra_caida[i][j] = false;
@@ -421,8 +575,8 @@ public class JogoDeCobra extends JFrame {
                 }    
         }
         else {
-          for (int i = 1; i <= height; i++) {
-             for (int j = 1; j <= width; j++) {
+          for (i = 1; i <= height; i++) {
+             for (j = 1; j <= width; j++) {
                   if (obstaculo[i][j] == true) {
                       if (obstaculo_direcao[i][j] == 1)
                           j2 = -1;
@@ -558,8 +712,8 @@ public class JogoDeCobra extends JFrame {
     }
     
     public void checkpointReiniciar(Graphics g,boolean[][] rival) {
-        for (int i = 0; i <= num_check; i++)
-            for (int j = 0; j <= 4; j++)
+        for (i = 0; i <= num_check; i++)
+            for (j = 0; j <= 4; j++)
                check_invalido[i][j] = false;
         for (i = 1; i <= height; i++)
             for (j = 1; j <= width; j++) 
@@ -571,12 +725,22 @@ public class JogoDeCobra extends JFrame {
         //check_invalido[0][atual < 3? atual+2 : atual-2] = true;
         permissao = true;
         rival_desistiu = false;
+        rival_anterior = rival_direcao;
         check_direcao[0] = rival_direcao;
         atual = rival_direcao;
         pos_x = (byte) rival_x[1];
         pos_y = (byte) rival_y[1];
-        alvo_y = cobra_y[0][0];
-        alvo_x = cobra_x[0][0];
+        //alvo_y = cobra_y[0][0];
+        //alvo_x = cobra_x[0][0];
+        alvo_y = biscoito_y;
+        alvo_x = biscoito_x;
+        g.setColor(Color.orange);
+        /*System.out.println(cobra_x[0][0]);
+        System.out.println(cobra_x[0][1]);
+        if (livre[alvo_y][alvo_x] == true && checkpoint[alvo_y][alvo_x] == false)
+          g.drawString("T",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));
+       else
+         g.drawString("F",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));*/
     }
           
   public void moverRival(Graphics g, Color rival_cor) {
@@ -717,12 +881,17 @@ public class JogoDeCobra extends JFrame {
     }
         
     public void paint(Graphics g) {
-        String highscore, score;
-        int high;
+        String highscore, score, scores = "";
+        int high, num_jogos = 0;
         highscore = "0"; tempStr = "0";
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("highscore.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("jogador.txt"));
             highscore = reader.readLine();
+            reader.close();
+            reader = new BufferedReader(new FileReader("/home/timana/Documents/3 Semestre/FP/Trabalho Semestral/estatisticas.txt"));
+            String tempStr = reader.readLine();
+            num_jogos = Integer.parseInt(tempStr);
+            scores = reader.readLine();
             reader.close();
         } catch (IOException ex) {
             java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
@@ -734,28 +903,28 @@ public class JogoDeCobra extends JFrame {
             Timer t = new Timer();
             Scanner ler = new Scanner(System.in);
             int meta;
-            short[] obstaculo_x = new short[61];
-            short[] obstaculo_y = new short[61];
+            short[] obstaculo_x = new short[201];
+            short[] obstaculo_y = new short[201];
             byte[] escolha_x = new byte[3];       
             byte[] escolha_y = new byte[3];
             short[] reescrever_x = new short[61];
             short[] reescrever_y = new short[61];
             cobra_tamanho = new short[4];
             char[] cobra_direcao = new char[4];
-            String replay_cobra, replay_biscoito;
+            String replay_cobra, replay_biscoito, replay_obs_add, replay_obs_num;
             short num_obstaculos, resto, timer_efeito;
             float tempFlt;
             byte pixel, campo, escolhido, num_perguntas, time, min, max, minas_y, minas_x, diametro;
             boolean lenda, perdeu, comido, /*gerado_obstaculos,*/ mesmo_grupo, minado;
             score = "0";
-            cobra_direcao[0] = "d".charAt(0); cobra_direcao[1] = "d".charAt(0); tempChr = "d".charAt(0); replay_cobra = ""; replay_biscoito = "";
+            cobra_direcao[0] = "d".charAt(0); cobra_direcao[1] = "d".charAt(0); tempChr = "d".charAt(0); replay_cobra = ""; replay_biscoito = ""; replay_obs_add = ""; replay_obs_num = "";
             quadro_x = 440; quadro_y = 150; pixel = 11; comp = 420; comp2 = 508; larg = 6; meta = 0;
             atraso = 68; timer_perguntas = 0; timer_resposta = 0; efeito = 0; timer_barra_efeito = 0; minas_y = 0; minas_x = 0;
-            boss_vida = 50; boss_vida_limite = 50; boss_direcao = 1; boss_movimento_timer = 0; boss_laser_count = 0; boss_laser_beam_length = 0; boss_laser_timer = 0; boss_laser_tipo = "simples"; atraso_boss_movimento = 15; boss_vida_alpha = 0; cobra_tiro_alpha = 0; atraso_boss_laser = 20;
-            sco = 0; num_grupos = 0; num_obstaculos = 0; cobra_tamanho[0] = 7; cobra_tamanho[1] = 7; rival_tamanho = 7; tempFlt = 0; biscoitos_comidos = 0; timer_efeito = 0; num_tiros = 0; num_jogadores = 1;
+            boss_vida = 50; boss_vida_limite = 50; boss_direcao = 1; boss_movimento_timer = 0; boss_ataque_count = 0; boss_ataque_beam_length = 0; boss_ataque_timer = 0; boss_ataque_timer_alvo = 0; boss_ataque_tipo = "laser"; atraso_boss_movimento = 15; boss_vida_alpha = 0; cobra_tiro_alpha = 0; atraso_boss_ataque = 5;
+            sco = 0; num_grupos = 0; num_obstaculos = 0; cobra_tamanho[0] = 7; cobra_tamanho[1] = 7; rival_tamanho = 7; tempFlt = 0; biscoitos_comidos = 0; timer_efeito = 0; num_tiros = 0; num_jogadores = 1; num_clicks = 0; inicio = 0; fim = 0;
             biscoito_x = 0; biscoito_y = 0; escolhido = -1; alpha = 5; diametro = 0; duplicador = 1; loop = 0; j2 = -1; inicio_x = 0; inicio_y = 0; fim_y = 0; atual = 1; rival_direcao = 3;
             perdeu = false; comido = true; biscoito_destruido = false; gerado_obstaculos = false; gerado_perguntas = false; minado = false; feito = false; noturno = false; noturnado = false; apagar = false; envenenado = false; cobra_movimento_iniciado = false;
-            boss = false; boss_derrotado = false; rival_derrotado = true; boss_impacto = false; boss_movimento_iniciado = false; lasado = false; obstaculado = false; interromper_boss_movimento = false; interromper_boss_laser = false; reagendar_boss_movimento = true; reagendar_boss_laser = true;
+            boss = false; boss_derrotado = false; rival_derrotado = true; boss_impacto = false; boss_movimento_iniciado = false; lasado = false; obstaculado = false; interromper_boss_movimento = false; interromper_boss_ataque = false; reagendar_boss_movimento = true; reagendar_boss_ataque = true; boss_ataque_refletor = false;
             
             g.setColor(Color.white);     
             //Font custom = new Font("Roboto",1,15);
@@ -795,7 +964,6 @@ public class JogoDeCobra extends JFrame {
             //g.drawString(score,quadro_x+comp2+larg+85,quadro_y+22);
             quadro_x += larg; quadro_y += larg;
 
-            Color cobra_cor = new Color(0,255,160);
             Color rival_cor = new Color(255,25,160);
             Color cobra_bomba_cor = new Color(76,44,18);
             Color biscoito_cor = Color.yellow;
@@ -817,14 +985,14 @@ public class JogoDeCobra extends JFrame {
             boolean[][] redesenhar = new boolean[height+2][width+2];
             escolha = new boolean[height+2][width+2];
             boolean[][] minas = new boolean[height+2][width+2];
-            boss_laser = new boolean[height+2][width+2];
+            boss_ataque = new boolean[height+2][width+2];
             checkpoint = new boolean[height+2][width+2];
-            int c = quadro_x+comp2;
+            c = quadro_x+comp2;
             int[] boss_corpo_x = {c+67,c+82,c+112,c+127,c+112,c+82,c+67};
             c = quadro_y;
             int[] boss_corpo_y = {c+210,c+185,c+185,c+210,c+235,c+235,c+210};
             boss_turbina_x = (short)(boss_corpo_x[2]-15); boss_turbina_y = (short)(boss_corpo_y[2]);
-            boss_laser_x = (short)((boss_corpo_x[0]-quadro_x)/11); boss_laser_y = (short)((boss_corpo_y[0]-quadro_y)/11); boss_laser_offset_y = (short)((boss_corpo_y[0]-quadro_y) % 11);
+            boss_ataque_x = (short)((boss_corpo_x[0]-quadro_x)/11); boss_ataque_y = (short)((boss_corpo_y[0]-quadro_y)/11); boss_ataque_offset_y = (short)((boss_corpo_y[0]-quadro_y) % 11);
 
             dificuldade = "easy";
             g.setColor(obstaculo_cor);
@@ -1017,7 +1185,7 @@ public class JogoDeCobra extends JFrame {
                g.drawString("derrote o boss",quadro_x+comp2+larg+78,quadro_y-7);
                
             iniciarCobra(g);
-            iniciarRival(g, rival_cor);
+            //iniciarRival(g, rival_cor);
             System.out.println("width: "+width);
             System.out.println("height: "+height);
             g.setColor(cobra_cor);
@@ -1033,7 +1201,8 @@ public class JogoDeCobra extends JFrame {
                    livre[y][x] = false;
                    g.setColor(biscoito_cor);
                    g.fillOval(quadro_x+((x-1)*11),quadro_y+((y-1)*11),10,10);
-                   replay_biscoito += y+" "+x+",";
+                   replay_biscoito += y < 10? "0"+y : y; 
+                   replay_biscoito += x < 10? "0"+x : x;
                    comido = false;
                    if (biscoito_destruido == true)
                        biscoito_destruido = false;
@@ -1042,7 +1211,7 @@ public class JogoDeCobra extends JFrame {
 
                     if ((sco % 200/*600/*0*/ == 0)&&(sco != 0)) {
 
-                        if (gerado_obstaculos == false && num_obstaculos < 60) /*&& (nivel == 3)*/ {
+                        if (gerado_obstaculos == false && num_obstaculos < 200) /*&& (nivel == 3)*/ {
                             num_obstaculos++;
                             do { //gera obstaculos;
                                 obstaculo_y[num_obstaculos] = (short) ((Math.random() * height) + 1);
@@ -1059,12 +1228,15 @@ public class JogoDeCobra extends JFrame {
                             g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
                             numero = (byte) ((Math.random() * 4) + 2);
                             campo = 1;
+                            replay_obs_add += y < 10? "0"+y : y; 
+                            replay_obs_add += x < 10? "0"+x : x;
+                            replay_obs_num += numero+"";
                             for (i = 1; i <= numero; i++) {
                                do {
                                    invalido = true;
                                    x2 = (short) ((x-campo)+(Math.random()*((campo*2)+1)));
                                    y2 = (short) ((y-campo)+(Math.random()*((campo*2)+1)));
-                                   if ((x2 > 0 && x2 <= width)&&(y2 > 0 && y2 <= height) && num_obstaculos < 60) {
+                                   if ((x2 > 0 && x2 <= width)&&(y2 > 0 && y2 <= height) && num_obstaculos < 200) {
                                         if ((livre[y2][x2] == true)&&(obstaculo[y2][x2-1] == true || obstaculo[y2][x2+1] == true || obstaculo[y2-1][x2] == true || obstaculo[y2+1][x2] == true)) {
                                              num_obstaculos++;
                                              campo++;
@@ -1076,6 +1248,8 @@ public class JogoDeCobra extends JFrame {
                                              livre[y2][x2] = false;
                                              invalido = false;
                                              g.fillRect(quadro_x+((x2-1)*11),quadro_y+((y2-1)*11),11,11);
+                                             replay_obs_add += y2 < 10? "0"+y2 : y2; 
+                                             replay_obs_add += x2 < 10? "0"+x2 : x2;
                                         }
                                    }
                                } while (invalido == true); 
@@ -1127,9 +1301,9 @@ public class JogoDeCobra extends JFrame {
                             g.fillRect(quadro_x+comp2+40,quadro_y+25,300,95);
                         }
                     }
-                    System.out.println("A rodar");
-                    if (boss_derrotado == false && sco == 600/*0*/ && (reagendar_boss_movimento == true || reagendar_boss_laser == true)) {//movimento do boss
+                    if (boss_derrotado == false && sco == 600/*0*/ && (reagendar_boss_movimento == true || reagendar_boss_ataque == true)) {//movimento do boss
                         System.out.println("Aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii: "+atraso_boss_movimento);
+                        boss = true;
                         g.setColor(new Color(69,222,227));
                         g.fillRoundRect(boss_corpo_x[3]+45,215,20,308,12,12);
                         g.setColor(new Color(61,68,179));
@@ -1151,7 +1325,7 @@ public class JogoDeCobra extends JFrame {
                                                if (boss_corpo_y[5] == quadro_y+comp)
                                                    boss_direcao = 1; //up
                                                 else
-                                                  if (boss_laser_count % 30 == 0 && boss_laser_count != 0) {
+                                                  if (boss_ataque_count % 3/*0*/ == 0 && boss_ataque_count != 0) {
                                                       if (boss_corpo_y[0] == (int)(quadro_y+(comp/2)) && boss_movimento_iniciado == false) {
                                                           boss_direcao = 3; //right
                                                           boss_movimento_iniciado = true;
@@ -1174,12 +1348,12 @@ public class JogoDeCobra extends JFrame {
                                                                  if (boss_corpo_x[0] == quadro_x+comp2+67) {
                                                                       boss_movimento_timer = 0;
                                                                       boss_direcao = (byte)((Math.random()*2)+1);
-                                                                      interromper_boss_laser = false;
+                                                                      interromper_boss_ataque = false;
                                                                       boss_movimento_iniciado = false;
                                                                       atraso_boss_movimento = 1000;
                                                                       reagendar_boss_movimento = true;
                                                                       boss_vida_alpha = 0;
-                                                                      boss_laser_count++;
+                                                                      boss_ataque_count++;
                                                                       g.setColor(fundo_cor);
                                                                       g.fillRect(boss_corpo_x[0]-8,boss_corpo_y[0]-4,10,8);
                                                                       g.fillRect(boss_corpo_x[0]-20,boss_corpo_y[0]-15,15,30);
@@ -1189,14 +1363,14 @@ public class JogoDeCobra extends JFrame {
                                                                       g.setColor(new Color(61,68,179));
                                                                       g.fillRoundRect(boss_corpo_x[3]+47,218,16,303,5,5);
                                                                       g.setColor(new Color(255,124,30));
-                                                                      for (int i = (short)(boss_vida-1); i >= 0; i--)
+                                                                      for (i = (short)(boss_vida-1); i >= 0; i--)
                                                                            g.fillRect(boss_corpo_x[3]+48,221+(i*6),14,4);
                                                                }
                                                            }   
                                                   }
-                                            if (boss_laser_tipo.equals("beam"))
+                                            if (boss_ataque_tipo.equals("beam"))
                                                 boss_movimento_timer++;
-                                            if ((!boss_laser_tipo.equals("beam")) || (boss_laser_tipo.equals("beam") && boss_movimento_timer == 2)) {
+                                            if ((!boss_ataque_tipo.equals("beam")) || (boss_ataque_tipo.equals("beam") && boss_movimento_timer == 2)) {
                                                 boss_movimento_timer = 0;
                                                 g.setColor(fundo_cor);
                                                 g.fillRect(boss_turbina_x,boss_turbina_y,40,10);
@@ -1206,7 +1380,7 @@ public class JogoDeCobra extends JFrame {
                                                     g.fillRect(boss_corpo_x[0]-8,boss_corpo_y[0]-4,10,8);
                                                     g.fillRect(boss_corpo_x[0]-20,boss_corpo_y[0]-15,15,30);
                                                 }
-                                                if (boss_laser_tipo.equals("beam")) {
+                                                if (boss_ataque_tipo.equals("beam")) {
                                                     if (boss_direcao == 1)
                                                         g.drawLine(quadro_x+1,boss_corpo_y[0]+8,boss_corpo_x[0],boss_corpo_y[0]+8);
                                                      else
@@ -1227,7 +1401,7 @@ public class JogoDeCobra extends JFrame {
                                                 g.fillRect(boss_turbina_x,boss_turbina_y,40,10);
                                                 g.fillRect(boss_turbina_x,boss_turbina_y+40,40,10);
                                                 g.setColor(boss_corpo_cor);
-                                                for (int i = 0; i <= 6; i++) {
+                                                for (i = 0; i <= 6; i++) {
                                                      switch (boss_direcao) {
                                                         case 1 -> boss_corpo_y[i]--;
                                                         case 2 -> boss_corpo_y[i]++;
@@ -1258,217 +1432,243 @@ public class JogoDeCobra extends JFrame {
                             };
                             t.scheduleAtFixedRate(mov,atraso_boss_movimento,atraso_boss_movimento);
                         }
-                        if (reagendar_boss_laser == true) {
-                            reagendar_boss_laser = false;
+                        if (reagendar_boss_ataque == true) {
+                            reagendar_boss_ataque = false;
                             TimerTask lsr = new TimerTask() {
                                 public void run() {
-                                    if (interromper_boss_laser == false) {
-                                        y = boss_laser_y; x = boss_laser_x;
-                                        if (boss_laser_count % 30 == 0 && boss_laser_count != 0) {
-                                            interromper_boss_laser = true;
-                                            atraso_boss_movimento = 10;}
-                                        else
-                                          if (boss_laser_count % 15 == 0 && boss_laser_count != 0) {
-                                              if (loop < 6) {
-                                                  boss_laser_tipo = "beam";
-                                                  interromper_boss_movimento = true; //t.wait on mov?
-                                                  reagendar_boss_laser = true;
-                                                  boss_laser_timer += 20;
-                                                  if (boss_laser_timer >= 500) {
-                                                      boss_laser_timer = 0;
-                                                      if (loop % 2 == 0)
-                                                          g.setColor(boss_laser_simples_cor);
-                                                       else
-                                                         g.setColor(fundo_cor);
-                                                      g.drawLine(quadro_x+1,boss_corpo_y[0],boss_corpo_x[0],boss_corpo_y[0]);
-                                                      loop++;
-                                                      if (loop == 6) {
-                                                          atraso_boss_laser = 50;
-                                                          reagendar_boss_laser = true;
-                                                      }    
-                                                  }
-                                              }
-                                              if (loop >= 6) {
-                                                  if (boss_laser_beam_length < boss_corpo_x[0]-quadro_x) {
-                                                      boss_laser_beam_length += 9;
-                                                  }
-                                                  if (boss_laser_beam_length > boss_corpo_x[0]-quadro_x)
-                                                      boss_laser_beam_length = (short)(boss_corpo_x[0]-quadro_x);
-                                                  if (boss_laser_timer < 400) {
-                                                      int boss_laser_beam_x[] = {boss_corpo_x[0],boss_corpo_x[0]-boss_laser_beam_length,boss_corpo_x[0]-boss_laser_beam_length-12,boss_corpo_x[0]-boss_laser_beam_length,boss_corpo_x[0]};
-                                                      int boss_laser_beam_y[] = {boss_corpo_y[0]-8,boss_corpo_y[0]-8,boss_corpo_y[0],boss_corpo_y[0]+8,boss_corpo_y[0]+8};
-                                                      g.fillPolygon(boss_laser_beam_x,boss_laser_beam_y,boss_laser_beam_x.length);      
-                                                      g.setColor(boss_laser_beam_cor1);
-                                                      g.fillRect(boss_corpo_x[0]-boss_laser_beam_length,boss_corpo_y[0]-6,boss_laser_beam_length,12);
-                                                  }
-                                                  else 
-                                                    if (apagar == true) {
-                                                        g.setColor(fundo_cor);
-                                                        g.fillRect(boss_corpo_x[0]-boss_laser_beam_length,boss_corpo_y[0]-8,9,17);  
-                                                    }
-                                                  if (boss_laser_beam_length == boss_corpo_x[0]-quadro_x && interromper_boss_movimento == true && apagar == false) {//chegou a parede
-                                                      interromper_boss_movimento = false;
-                                                      boss_direcao = 0;
-                                                      for (int i = 1; i <= cobra_tamanho[0]; i++) {
-                                                          if ((quadro_y+(cobra_y[0][i]*11)) <= boss_corpo_y[0]) {
-                                                               boss_direcao = 1;
-                                                               break;
-                                                          }     
+                                    boss_ataque_timer += 20;
+                                    boss_ataque_timer_alvo = 100;
+                                    if (interromper_boss_ataque == false && boss_ataque_timer >= boss_ataque_timer_alvo) {
+                                        boss_ataque_timer = 0;
+                                        y = boss_ataque_y; x = boss_ataque_x;
+                                        if (boss_ataque_refletor == false) {
+                                            if (boss_ataque_count % 30 == 0 && boss_ataque_count != 0) {
+                                                interromper_boss_ataque = true;
+                                                atraso_boss_movimento = 10;}
+                                            else
+                                              if (boss_ataque_count % 15 == 0 && boss_ataque_count != 0) {
+                                                  if (loop < 6) {
+                                                      boss_ataque_tipo = "beam";
+                                                      interromper_boss_movimento = true; //t.wait on mov?
+                                                      reagendar_boss_ataque = true;
+                                                      //boss_ataque_timer += 20;
+                                                      if (boss_ataque_timer >= 500) {
+                                                          boss_ataque_timer = 0;
+                                                          if (loop % 2 == 0)
+                                                              g.setColor(boss_ataque_laser_cor);
+                                                           else
+                                                             g.setColor(fundo_cor);
+                                                          g.drawLine(quadro_x+1,boss_corpo_y[0],boss_corpo_x[0],boss_corpo_y[0]);
+                                                          loop++;
+                                                          if (loop == 6) {
+                                                              atraso_boss_ataque = 50;
+                                                              boss_ataque_timer_alvo = 0;
+                                                              reagendar_boss_ataque = true;
+                                                          }    
                                                       }
-                                                      if (boss_direcao == 0)
-                                                          boss_direcao = 2;}
-                                                   else
-                                                     if (boss_laser_timer == 400 && interromper_boss_movimento == false) {
-                                                         boss_laser_beam_length = 0;
-                                                         interromper_boss_movimento = true;
-                                                         atraso_boss_movimento = 300;
-                                                         apagar = true;
-                                                         y = (short)((boss_corpo_y[0]-quadro_y)/11);
-                                                         for (int i = 1; i <= 2; i++) {//patch. faca ler somente blocos unicos
-                                                             for (int j = 1; j <= width; j++) {
-                                                                 boss_laser[y+i][j] = true;
-                                                                 livre[y+i][j] = false;
+                                                  }
+                                                  if (loop >= 6) {
+                                                      if (boss_ataque_beam_length < boss_corpo_x[0]-quadro_x) {
+                                                          boss_ataque_beam_length += 9;
+                                                      }
+                                                      if (boss_ataque_beam_length > boss_corpo_x[0]-quadro_x)
+                                                          boss_ataque_beam_length = (short)(boss_corpo_x[0]-quadro_x);
+                                                      if (boss_ataque_timer < 400) {
+                                                          int boss_ataque_beam_x[] = {boss_corpo_x[0],boss_corpo_x[0]-boss_ataque_beam_length,boss_corpo_x[0]-boss_ataque_beam_length-12,boss_corpo_x[0]-boss_ataque_beam_length,boss_corpo_x[0]};
+                                                          int boss_ataque_beam_y[] = {boss_corpo_y[0]-8,boss_corpo_y[0]-8,boss_corpo_y[0],boss_corpo_y[0]+8,boss_corpo_y[0]+8};
+                                                          g.fillPolygon(boss_ataque_beam_x,boss_ataque_beam_y,boss_ataque_beam_x.length);      
+                                                          g.setColor(boss_ataque_beam_cor1);
+                                                          g.fillRect(boss_corpo_x[0]-boss_ataque_beam_length,boss_corpo_y[0]-6,boss_ataque_beam_length,12);
+                                                      }
+                                                      else 
+                                                        if (apagar == true) {
+                                                            g.setColor(fundo_cor);
+                                                            g.fillRect(boss_corpo_x[0]-boss_ataque_beam_length,boss_corpo_y[0]-8,9,17);  
+                                                        }
+                                                      if (boss_ataque_beam_length == boss_corpo_x[0]-quadro_x && interromper_boss_movimento == true && apagar == false) {//chegou a parede
+                                                          interromper_boss_movimento = false;
+                                                          boss_direcao = 0;
+                                                          for (i = 1; i <= cobra_tamanho[0]; i++) {
+                                                              if ((quadro_y+(cobra_y[0][i]*11)) <= boss_corpo_y[0]) {
+                                                                   boss_direcao = 1;
+                                                                   break;
+                                                              }     
+                                                          }
+                                                          if (boss_direcao == 0)
+                                                              boss_direcao = 2;}
+                                                       else
+                                                         if (boss_ataque_timer == 400 && interromper_boss_movimento == false) {
+                                                             boss_ataque_beam_length = 0;
+                                                             interromper_boss_movimento = true;
+                                                             atraso_boss_movimento = 300;
+                                                             apagar = true;
+                                                             y = (short)((boss_corpo_y[0]-quadro_y)/11);
+                                                             for (i = 1; i <= 2; i++) {//patch. faca ler somente blocos unicos
+                                                                 for (j = 1; j <= width; j++) {
+                                                                     boss_ataque[y+i][j] = true;
+                                                                     livre[y+i][j] = false;
+                                                                 }
                                                              }
                                                          }
-                                                     }
-                                                     else
-                                                       if (boss_laser_beam_length == boss_corpo_x[0]-quadro_x && interromper_boss_movimento == false)
-                                                           boss_laser_timer++;
-                                                  //sai aqui
-                                                  if (boss_laser_beam_length == boss_corpo_x[0]-quadro_x && apagar == true) {
-                                                      boss_laser_tipo = "simples";
-                                                      atraso_boss_laser = 900;
-                                                      reagendar_boss_laser = true;
-                                                      loop = 0;
-                                                      boss_laser_timer = 0;
-                                                      boss_laser_count++;
-                                                      boss_laser_beam_length = 0;
-                                                      atraso_boss_movimento = 1000;
-                                                      interromper_boss_movimento = false;
-                                                      apagar = false;
-                                                  }
-                                                  /*g.setColor(fundo_cor);
-                                                  g.fillRect(quadro_x,quadro_y,width*11,height*11);
-                                                  for (int i = 1; i <= height; i++) {
-                                                      for (int j = 1; j <= width; j++) {
-                                                          g.setColor(Color.white);
-                                                          if (boss_laser[i][j] == true)
-                                                              g.drawString("T",quadro_x+((j-1)*11),quadro_y+(i*11));
+                                                         else
+                                                           if (boss_ataque_beam_length == boss_corpo_x[0]-quadro_x && interromper_boss_movimento == false)
+                                                               boss_ataque_timer++;
+                                                      //sai aqui
+                                                      if (boss_ataque_beam_length == boss_corpo_x[0]-quadro_x && apagar == true) {
+                                                          boss_ataque_tipo = "laser";
+                                                          atraso_boss_ataque = 900;
+                                                          reagendar_boss_ataque = true;
+                                                          loop = 0;
+                                                          boss_ataque_timer = 0;
+                                                          boss_ataque_count++;
+                                                          boss_ataque_beam_length = 0;
+                                                          atraso_boss_movimento = 1000;
+                                                          interromper_boss_movimento = false;
+                                                          apagar = false;
+                                                      }
+                                                      /*g.setColor(fundo_cor);
+                                                      g.fillRect(quadro_x,quadro_y,width*11,height*11);
+                                                      for (i = 1; i <= height; i++) {
+                                                          for (j = 1; j <= width; j++) {
+                                                              g.setColor(Color.white);
+                                                              if (boss_ataque[i][j] == true)
+                                                                  g.drawString("T",quadro_x+((j-1)*11),quadro_y+(i*11));
+                                                               else
+                                                                 g.drawString("F",quadro_x+((j-1)*11),quadro_y+(i*11));
+                                                          }
+                                                      }*/
+                                                      if (((boss_corpo_x[0]-quadro_x)-boss_ataque_beam_length)/11 <= width) {
+                                                          y = (short)((boss_corpo_y[0]-quadro_y)/11);
+                                                          if (interromper_boss_movimento == true) {
+                                                              x = (short)(((boss_corpo_x[0]-quadro_x)-boss_ataque_beam_length)/11);
+                                                              linha1 = 1; linha2 = 2;}
                                                            else
-                                                             g.drawString("F",quadro_x+((j-1)*11),quadro_y+(i*11));
-                                                      }
-                                                  }*/
-                                                  if (((boss_corpo_x[0]-quadro_x)-boss_laser_beam_length)/11 <= width) {
-                                                      y = (short)((boss_corpo_y[0]-quadro_y)/11);
-                                                      if (interromper_boss_movimento == true) {
-                                                          x = (short)(((boss_corpo_x[0]-quadro_x)-boss_laser_beam_length)/11);
-                                                          linha1 = 1; linha2 = 2;}
-                                                       else
-                                                         if (boss_laser_timer != 420){
-                                                             if (boss_direcao == 1) {
-                                                                 linha1 = 0; linha2 = 2; }
-                                                              else {
-                                                                linha1 = -1; linha2 = 1; }
-                                                       }
-                                                      for (int j = 1; j <= width; j++) {
-                                                           if (interromper_boss_movimento == false)
-                                                               x = (short)(j);
-                                                           for (int i = linha1; i <= linha2; i++) {
-                                                                if ( i == -1 || i == 2 || boss_laser_timer >= 400) {//torna false os lugares onde o laser ja nao esta
-                                                                    boss_laser[y+i][x] = false;
-                                                                    livre[y+i][x] = true;
-                                                                }
-                                                                else {
-                                                                  boss_laser[y+i][x] = true;
-                                                                  livre[y+i][x] = false;
-                                                                  if (escolha[y+i][x] == true)
-                                                                     escolha[y+i][x] = false;
-                                                                   else
-                                                                     if (obstaculo[y+i][x] == true)
-                                                                         obstaculo[y+i][x] = false;
-                                                                      else
-                                                                        if (x == biscoito_y && y+i == biscoito_y)
-                                                                            biscoito_destruido = true;
-                                                                         else
-                                                                           if (cobra_caida[y+i][x] == true)
-                                                                               cobra_caida[y+i][x] = false;
-                                                                            else
-                                                                              if (cobra[y+i][x] == true && efeito != 6) {//usado muitas vezes - metodo
-                                                                                  tempShrt = cobra_tamanho[0];
-                                                                                  for (int i2 = 1; i2 <= tempShrt; i2++) {
-                                                                                       if (cobra_y[0][i2] == y+i && cobra_x[0][i2] == x) {
-                                                                                           cobra_tamanho[0] = (short)(i2-1);
-                                                                                           for (i2 = (short)(cobra_tamanho[0]+1); i2 <= tempShrt; i2++) {
-                                                                                                y = cobra_y[0][i2]; x = cobra_x[0][i2];
-                                                                                                cobra[y][x] = false;
-                                                                                                cobra_caida[y][x] = true;
-                                                                                           }
-                                                                                           if (cobra_tamanho[0] <= 4)
-                                                                                               lasado = true;
-                                                                                           if (num_tiros > 0) {
-                                                                                               num_tiros -= tempShrt-cobra_tamanho[0];
-                                                                                               if (num_tiros < 0)
-                                                                                                   num_tiros = 0;
-                                                                                               biscoitos_comidos = 0;
-                                                                                           }
-                                                                                           break;
-                                                                                       }
-                                                                                  }
-                                                                              }
-                                                                  g.setColor(fundo_cor);
-                                                                  if (i == -1) //elimina o excesso na parte de cima e de baixo do beam
-                                                                      g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,3);
-                                                                   else
-                                                                     g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+8,11,3);
-                                                                }
+                                                             if (boss_ataque_timer != 420){
+                                                                 if (boss_direcao == 1) {
+                                                                     linha1 = 0; linha2 = 2; }
+                                                                  else {
+                                                                    linha1 = -1; linha2 = 1; }
                                                            }
-                                                           if (interromper_boss_movimento == true)
-                                                               break;
+                                                          for (j = 1; j <= width; j++) {
+                                                               if (interromper_boss_movimento == false)
+                                                                   x = (short)(j);
+                                                               for (i = linha1; i <= linha2; i++) {
+                                                                    if ( i == -1 || i == 2 || boss_ataque_timer >= 400) {//torna false os lugares onde o laser ja nao esta
+                                                                        boss_ataque[y+i][x] = false;
+                                                                        livre[y+i][x] = true;
+                                                                    }
+                                                                    else {
+                                                                      boss_ataque[y+i][x] = true;
+                                                                      livre[y+i][x] = false;
+                                                                      if (escolha[y+i][x] == true)
+                                                                         escolha[y+i][x] = false;
+                                                                       else
+                                                                         if (obstaculo[y+i][x] == true)
+                                                                             obstaculo[y+i][x] = false;
+                                                                          else
+                                                                            if (x == biscoito_y && y+i == biscoito_y)
+                                                                                biscoito_destruido = true;
+                                                                             else
+                                                                               if (cobra_caida[y+i][x] == true)
+                                                                                   cobra_caida[y+i][x] = false;
+                                                                                else
+                                                                                  if (cobra[y+i][x] == true && efeito != 6) {//usado muitas vezes - metodo
+                                                                                      tempShrt = cobra_tamanho[0];
+                                                                                      for (i2 = 1; i2 <= tempShrt; i2++) {
+                                                                                           if (cobra_y[0][i2] == y+i && cobra_x[0][i2] == x) {
+                                                                                               cobra_tamanho[0] = (short)(i2-1);
+                                                                                               for (i2 = (short)(cobra_tamanho[0]+1); i2 <= tempShrt; i2++) {
+                                                                                                    y = cobra_y[0][i2]; x = cobra_x[0][i2];
+                                                                                                    cobra[y][x] = false;
+                                                                                                    cobra_caida[y][x] = true;
+                                                                                               }
+                                                                                               if (cobra_tamanho[0] <= 4)
+                                                                                                   lasado = true;
+                                                                                               if (num_tiros > 0) {
+                                                                                                   num_tiros -= tempShrt-cobra_tamanho[0];
+                                                                                                   if (num_tiros < 0)
+                                                                                                       num_tiros = 0;
+                                                                                                   biscoitos_comidos = 0;
+                                                                                               }
+                                                                                               break;
+                                                                                           }
+                                                                                      }
+                                                                                  }
+                                                                      g.setColor(fundo_cor);
+                                                                      if (i == -1) //elimina o excesso na parte de cima e de baixo do beam
+                                                                          g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,3);
+                                                                       else
+                                                                         g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+8,11,3);
+                                                                    }
+                                                               }
+                                                               if (interromper_boss_movimento == true)
+                                                                   break;
+                                                          }
                                                       }
                                                   }
-                                              }
-                                          }   
-                                          else   
-                                            if (boss_laser_count % 5 == 0 && boss_laser_count != 0)
-                                                boss_laser_tipo = "perfurador";
-                                             else
-                                               boss_laser_tipo = "simples";
-                                        if (!(boss_laser_tipo.equals("beam"))) {
+                                              }   
+                                              else   
+                                                if (boss_ataque_count % 5 == 0 && boss_ataque_count != 0)
+                                                    boss_ataque_tipo = "perfurador";
+                                                 else
+                                                   boss_ataque_tipo = "laser";
+                                        }
+                                        if (!(boss_ataque_tipo.equals("beam"))) {
                                             if (x <= width) {
-                                                boss_laser[y][x] = false;
+                                                boss_ataque[y][x] = false;
                                                 if (cobra[y][x] == false)
                                                     livre[y][x] = true;
                                             }
                                             g.setColor(fundo_cor);
-                                            if (boss_laser_tipo.equals("simples"))
-                                                g.drawLine(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+boss_laser_offset_y,quadro_x+((x-1)*11)+8,quadro_y+((y-1)*11)+boss_laser_offset_y);
-                                             else
-                                               g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,6);
-                                            boss_laser_x--;
-                                            x = boss_laser_x;
+                                            switch (boss_ataque_tipo) {
+                                                case "laser" -> g.drawLine(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+boss_ataque_offset_y,quadro_x+((x-1)*11)+8,quadro_y+((y-1)*11)+boss_ataque_offset_y);
+                                                case "perfurador" -> g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,6);
+                                                default -> g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                                            }
+                                            System.out.println("boss_ataque_y: "+boss_ataque_y);
+                                            System.out.println("boss_ataque_x: "+boss_ataque_x);
+                                            if (cobra_empurrada == true && x <= width+1 && cobra[y][x-1] == true) {
+                                                empurrarCobra(g);
+                                            }
+                                            boss_ataque_x--;
+                                            y = boss_ataque_y; x = boss_ataque_x;
                                             if (x <= width) {
-                                                boss_laser[y][x] = true;
+                                                boss_ataque[y][x] = true;
                                                 livre[y][x] = false;
                                             }
-                                            if (boss_laser_tipo.equals("simples")) {
-                                                g.setColor(boss_laser_simples_cor);
-                                                g.drawLine(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+boss_laser_offset_y,quadro_x+((x-1)*11)+8,quadro_y+((y-1)*11)+boss_laser_offset_y);}
-                                             else { 
-                                               g.setColor(boss_laser_perfurador_cor);
-                                               g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,6); 
-                                             }
-
+                                            switch (boss_ataque_tipo) {
+                                                case "laser" -> {
+                                                    g.setColor(boss_ataque_laser_cor);
+                                                    g.drawLine(quadro_x+((x-1)*11),quadro_y+((y-1)*11)+boss_ataque_offset_y,quadro_x+((x-1)*11)+8,quadro_y+((y-1)*11)+boss_ataque_offset_y);
+                                                }
+                                                case "perfurador" -> {
+                                                    g.setColor(boss_ataque_perfurador_cor);
+                                                    g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,6);
+                                                }
+                                                default -> {
+                                                    g.setColor(boss_ataque_refletor_cor2);
+                                                    g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                                                }
+                                            }
                                             if (x <= width) {//usado no beam tambem. Torne num metodo
-                                                if (cobra[y][x] == true && efeito != 6) {
+                                                if (cobra[y][x] == true && efeito != 6 && cobra_empurrada == false) {
                                                     tempShrt = cobra_tamanho[0];
-                                                    if (boss_laser_tipo.equals("perfurador")) {
+                                                    if (boss_ataque_tipo.equals("perfurador")) {
                                                         cobra[y][x] = false;
                                                         livre[y][x] = true;
                                                         g.setColor(fundo_cor);
                                                         g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,6); 
                                                     }
-                                                    for (int i = 1; i <= tempShrt; i++) {
-                                                         if (cobra_y[0][i] == y && cobra_x[0][i] == x) {
+                                                    for (i = 1; i <= tempShrt; i++) {
+                                                         if (cobra_y[0][i] == boss_ataque_y && cobra_x[0][i] == boss_ataque_x) {
+                                                             if (boss_ataque_refletor == true) {
+                                                                 boss_ataque_refletor_ponto = (short) i;
+                                                                 cobra_empurrada = true;
+                                                                 boss_ataque_x++;
+                                                                 //boss_ataque_timer_alvo = 60;
+                                                                 boss_ataque_timer_alvo = 1000;
+                                                                 break;
+                                                             }
                                                              cobra_tamanho[0] = (short)(i-1);
                                                              for (i = (short)(cobra_tamanho[0]+1); i <= tempShrt; i++) {
                                                                   y = cobra_y[0][i]; x = cobra_x[0][i];
@@ -1494,17 +1694,21 @@ public class JogoDeCobra extends JFrame {
                                                       g.fillOval(quadro_x+((x-1)*11),quadro_y+((y-1)*11),10,10);
                                                   }
                                                   else
-                                                    if (((obstaculo[y][x] == true || (y == cobra_tiro_y && x == cobra_tiro_x)) && boss_laser_tipo.equals("simples")) || x == 0) {
-                                                        /*if boss_laser_tipo == 1*/
+                                                    if (((obstaculo[y][x] == true || (y == cobra_tiro_y && x == cobra_tiro_x)) && boss_ataque_tipo.equals("laser")) || x == 0) {
+                                                        /*if boss_ataque_tipo == 1*/
                                                         if (obstaculo[y][x] == true) {
                                                             g.setColor(obstaculo_cor);
                                                             g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
                                                         }
-                                                        boss_laser[y][x] = false;
-                                                        boss_laser_y = (short) ((boss_corpo_y[0]-quadro_y+11)/11);
-                                                        boss_laser_x = (short) ((boss_corpo_x[0]-quadro_x)/11);
-                                                        boss_laser_offset_y = (short)((boss_corpo_y[0]-quadro_y) % 11);
-                                                        boss_laser_count++;
+                                                        boss_ataque[y][x] = false;
+                                                        boss_ataque_y = (short) ((boss_corpo_y[0]-quadro_y+11)/11);
+                                                        boss_ataque_x = (short) ((boss_corpo_x[0]-quadro_x)/11);
+                                                        boss_ataque_offset_y = (short)((boss_corpo_y[0]-quadro_y) % 11);
+                                                        boss_ataque_count++;
+                                                        if (boss_ataque_refletor == true) {
+                                                            boss_ataque_refletor = false;
+                                                            interromper_boss_movimento = false;
+                                                        }
                                                         /*else
                                                         //redesenhar
                                                         */   
@@ -1520,7 +1724,7 @@ public class JogoDeCobra extends JFrame {
                                     }
                                 }
                             };
-                            t.scheduleAtFixedRate(lsr,/*500*/0,atraso_boss_laser);
+                            t.scheduleAtFixedRate(lsr,/*500*/0,atraso_boss_ataque);
                         }
                     }
                 }//escolher tipos apropriados para as variaveis: height, width
@@ -1556,7 +1760,7 @@ public class JogoDeCobra extends JFrame {
                                     timer_resposta = 0;
                                     gerado_perguntas = false;
                                     g.fillRect(quadro_x-320,quadro_y-11,300,95);
-                                    for (int i = 0; i <= 2; i++) {
+                                    for (i = 0; i <= 2; i++) {
                                          y = escolha_y[i];
                                          x = escolha_x[i];
                                          g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
@@ -1569,7 +1773,7 @@ public class JogoDeCobra extends JFrame {
                                     g.setColor(Color.red);
                                     g.fillRect(quadro_x+26,quadro_y+comp+23,comp2-142,47);
                                     g.setColor(Color.white);
-                                    for (int i = 0; i <= 11; i++) {
+                                    for (i = 0; i <= 11; i++) {
                                         int px[] = {466+(i*30),490+(i*30),494+(i*30),470+(i*30)};
                                         int py[] = {641,592,592,641};
                                         g.fillPolygon(px,py,px.length);
@@ -1602,94 +1806,102 @@ public class JogoDeCobra extends JFrame {
                 };
                 t.schedule(enter,400,20);//original: 400, altered because sharp turns were not triggering
 
+                tempStr = ("m"+ler.nextLine());
+                tempChr = tempStr.charAt(tempStr.length()-1);
                 switch (tempChr) {
-                    case 112 : interromper_boss_movimento = true; //p
-                                interromper_boss_laser = true;
-                                tempChr = 0;
-                                if (efeito != 0)
-                                    tempShrt = timer_resposta;
-                                 else 
-                                   tempShrt = timer_efeito; 
-                                while (tempChr != 112) {
-                                    TimerTask enter2 = new TimerTask() {
-                                        @Override
-                                        public void run() {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException ex) {
-                                                java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                                            }
-                                            try {
-                                                Robot rob = null;
-                                                rob = new Robot();
-                                                rob.keyPress(KeyEvent.VK_ENTER);
-                                                rob.keyRelease(KeyEvent.VK_ENTER);
-                                            } catch (AWTException ex) {
-                                                java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                                            }
-                                        }
-                                    };
-                                    t.scheduleAtFixedRate(enter2,1000,1000);
-                                    tempStr = (ler.nextLine() + "m").toLowerCase();
-                                    tempChr = tempStr.charAt(0);
-                                    enter2.cancel();
+                    case 112 -> {
+                        interromper_boss_movimento = true; //p
+                        interromper_boss_ataque = true;
+                        tempChr = 0;
+                        if (efeito != 0)
+                            tempShrt = timer_resposta;
+                        else
+                            tempShrt = timer_efeito;
+                        while (tempChr != 112) {
+                            TimerTask enter2 = new TimerTask() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException ex) {
+                                        java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                                    }
+                                    try {
+                                        Robot rob = null;
+                                        rob = new Robot();
+                                        rob.keyPress(KeyEvent.VK_ENTER);
+                                        rob.keyRelease(KeyEvent.VK_ENTER);
+                                    } catch (AWTException ex) {
+                                        java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                                    }
                                 }
-                                interromper_boss_movimento = false;
-                                interromper_boss_laser = false;
-                                if (efeito != 0)
-                                    timer_resposta = tempShrt;
-                                 else 
-                                   timer_efeito = tempShrt;
+                            };
+                            t.scheduleAtFixedRate(enter2,1000,1000);
+                            tempStr = (ler.nextLine() + "m").toLowerCase();
+                            tempChr = tempStr.charAt(0);
+                            enter2.cancel();
+                        }
+                        interromper_boss_movimento = false;
+                        interromper_boss_ataque = false;
+                        if (efeito != 0)
+                            timer_resposta = tempShrt;
+                        else
+                            timer_efeito = tempShrt;
+                    }
+                    case 48 -> {
+                        if (num_tiros > 0 && cobra_tiro_disparado == false && boss == true) {//0
+                            cobra_tiro_disparado = true;
+                            num_tiros--;
+                            y = cobra_y[0][cobra_tamanho[0]]; x = cobra_x[0][cobra_tamanho[0]];
+                            cobra[y][x] = false;
+                            livre[y][x] = true;
+                            cobra_tamanho[0]--;
+                            g.setColor(fundo_cor);
+                            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                            cobra_tiro_direcao = cobra_direcao[0];
+                            cobra_tiro_x = cobra_x[0][1];
+                            cobra_tiro_y = cobra_y[0][1];
+                            switch (cobra_tiro_direcao) {
+                                case 119 -> cobra_tiro_y -= 3;//w
+                                case 97 -> cobra_tiro_x -= 3;//a
+                                case 115 -> cobra_tiro_y += 3;//s
+                                case 100 -> cobra_tiro_x += 3;//d
+                            }
+                            cobra_tiro_alpha = 0;
+                            cobraTiro(g);
+                        }
+                    }
+                    case 32 -> {
+                        if (cobra_presa == true)
+                            System.out.println("clicks: "+(++num_clicks));
+                    }
+                }
+                if (cobra_empurrada == false) {
+                    for (i = 0; i < num_jogadores; i++) { 
+                        for (j = 0; j < tempStr.length(); j++) {
+                            tempChr = tempStr.charAt(j);
+                            if (direcaoValida(cobra_direcao) == true) {
+                                cobra_direcao[i] = tempChr;
                                 break;
-                    case 48 : if (num_tiros > 0 && cobra_tiro_disparado == false && boss == true) {//0
-                                  cobra_tiro_disparado = true;
-                                  num_tiros--;
-                                  y = cobra_y[0][cobra_tamanho[0]]; x = cobra_x[0][cobra_tamanho[0]];
-                                  cobra[y][x] = false;
-                                  livre[y][x] = true;
-                                  cobra_tamanho[0]--;
-                                  g.setColor(fundo_cor);
-                                  g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
-                                  cobra_tiro_direcao = cobra_direcao[0];
-                                  cobra_tiro_x = cobra_x[0][1];
-                                  cobra_tiro_y = cobra_y[0][1];
-                                  switch (cobra_tiro_direcao) {
-                                        case 119 -> cobra_tiro_y -= 3;//w
-                                        case 97 -> cobra_tiro_x -= 3;//a
-                                        case 115 -> cobra_tiro_y += 3;//s
-                                        case 100 -> cobra_tiro_x += 3;//d
-                                   }
-                                  cobra_tiro_alpha = 0;
-                                  cobraTiro(g);
-                                  break;
-                              }    
-                                  
-                }
-                tempStr = (ler.nextLine() + "m");
-                for (i = 0; i < num_jogadores; i++) { 
-                    for (j = 0; j < tempStr.length(); j++) {
-                        tempChr = tempStr.charAt(j);
-                        if (direcaoValida(cobra_direcao) == true) {
-                            cobra_direcao[i] = tempChr;
-                            break;
-                        }    
+                            }    
+                        }
+                        switch (cobra_direcao[i]) {
+                            case 119,105 : {cobra_y[i][0] = (byte) (cobra_y[i][1] - 1);//W
+                                            cobra_x[i][0] = cobra_x[i][1]; cobra_movimento_iniciado = true;
+                                            break;}
+                            case 97, 106 : {cobra_x[i][0] = (byte) (cobra_x[i][1] - 1);//A
+                                           cobra_y[i][0] = cobra_y[i][1]; cobra_movimento_iniciado = true;
+                                           break;}
+                            case 115,107 : {cobra_y[i][0] = (byte) (cobra_y[i][1] + 1);//S
+                                            cobra_x[i][0] = cobra_x[i][1]; cobra_movimento_iniciado = true;
+                                            break;}
+                            case 100,108 : {cobra_x[i][0] = (byte) (cobra_x[i][1] + 1);//D
+                                            cobra_y[i][0] = cobra_y[i][1]; cobra_movimento_iniciado = true;
+                                            break;}
+                        }
                     }
-                    switch (cobra_direcao[i]) {
-                        case 119,105 : {cobra_y[i][0] = (byte) (cobra_y[i][1] - 1);//W
-                                        cobra_x[i][0] = cobra_x[i][1]; cobra_movimento_iniciado = true;
-                                        break;}
-                        case 97, 106 : {cobra_x[i][0] = (byte) (cobra_x[i][1] - 1);//A
-                                       cobra_y[i][0] = cobra_y[i][1]; cobra_movimento_iniciado = true;
-                                       break;}
-                        case 115,107 : {cobra_y[i][0] = (byte) (cobra_y[i][1] + 1);//S
-                                        cobra_x[i][0] = cobra_x[i][1]; cobra_movimento_iniciado = true;
-                                        break;}
-                        case 100,108 : {cobra_x[i][0] = (byte) (cobra_x[i][1] + 1);//D
-                                        cobra_y[i][0] = cobra_y[i][1]; cobra_movimento_iniciado = true;
-                                        break;}
-                    }
+                    replay_cobra += cobra_direcao[0];
                 }
-                replay_cobra += cobra_direcao[0];
                 if (rival_derrotado == false)
                     moverRival(g,rival_cor);
                 if (efeito == 4) {
@@ -1706,9 +1918,9 @@ public class JogoDeCobra extends JFrame {
                   }
                 x = cobra_x[0][0]; y = cobra_y[0][0];
                 g.setColor(cobra_cor);
-                if (boss_laser[y][x] == true && efeito != 6)
+                if (boss_ataque[y][x] == true && efeito != 6 && boss_ataque_refletor == false)
                     lasado = true;
-                if ((((cobra[y][x] == true || rival[y][x] == true || cobra_caida[y][x] == true || minado == true || lasado == true || obstaculado == true || envenenado == true || (obstaculo[y][x] == true && efeito != 5))) && efeito != 6) || (y == 0 || y == height+1 || x == 0 || x == width+1)) {
+                if (cobra_empurrada == false && (((cobra[y][x] == true || rival[y][x] == true || cobra_caida[y][x] == true || minado == true || lasado == true || obstaculado == true || envenenado == true || (obstaculo[y][x] == true && efeito != 5))) && efeito != 6) || (y == 0 || y == height+1 || x == 0 || x == width+1)) {
                     perdeu = true; //cancel schedule
                 }
                  else {
@@ -1740,12 +1952,14 @@ public class JogoDeCobra extends JFrame {
                        }
 
                    }
-                   g.setColor(fundo_cor);
-                   for (int i = 0; i < num_jogadores; i++) {
-                       x = cobra_x[i][cobra_tamanho[i]]; y = cobra_y[i][cobra_tamanho[i]];
-                       g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
-                       livre[y][x] = true;
-                       cobra[y][x] = false;
+                   if (cobra_empurrada == false) {
+                       g.setColor(fundo_cor);
+                       for (i = 0; i < num_jogadores; i++) {
+                           x = cobra_x[i][cobra_tamanho[i]]; y = cobra_y[i][cobra_tamanho[i]];
+                           g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                           livre[y][x] = true;
+                           cobra[y][x] = false;
+                   }
                    }
                    if (efeito == 6) {
                        if (obstaculo[y][x] == true)
@@ -1858,19 +2072,23 @@ public class JogoDeCobra extends JFrame {
                                  }
                              }
                        }
-                   for (i = 0; i < num_jogadores; i++) {
-                        for (j = (short) (cobra_tamanho[i]-1); j >= 0; j--) {
-                            cobra_x[i][j+1] = cobra_x[i][j];
-                            cobra_y[i][j+1] = cobra_y[i][j];
-                        }
-                        x = cobra_x[i][1]; y = cobra_y[i][1];
-                        livre[y][x] = false;
-                        cobra[y][x] = true;
-                        if (efeito != 5)
-                            g.setColor(cobra_cor);
-                         else
-                           g.setColor(cobra_bomba_cor); 
-                        g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                   if (cobra_empurrada == false) {
+                       for (i = 0; i < num_jogadores; i++) {
+                            for (j = (short) (cobra_tamanho[i]-1); j >= 0; j--) {
+                                cobra_x[i][j+1] = cobra_x[i][j];
+                                cobra_y[i][j+1] = cobra_y[i][j];
+                            }
+                            x = cobra_x[i][1]; y = cobra_y[i][1];
+                            
+                            //System.out.println("cobra_y: "+cobra_y[0][1]+", cobra_x: "+cobra_x[0][1]);
+                            livre[y][x] = false;
+                            cobra[y][x] = true;
+                            if (efeito != 5)
+                                g.setColor(cobra_cor);
+                             else
+                               g.setColor(cobra_bomba_cor); 
+                            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+                       }
                    }
                    if (num_tiros > 0) {
                        g.setColor(cobra_tiro_cor);
@@ -1928,7 +2146,7 @@ public class JogoDeCobra extends JFrame {
                              efeito = (byte)((Math.random()*6)+7);
                              g.setColor(Color.red);
                            }
-                          efeito = 6;//jump
+                          efeito = 10;//jump
                           //desenharEfeito();
                           g.fillRect(quadro_x+26,quadro_y+comp+23,comp2-142,47);
                           g.setColor(Color.white);
@@ -1956,27 +2174,35 @@ public class JogoDeCobra extends JFrame {
             }
             BufferedWriter writer;
             try {
-                writer = new BufferedWriter(new FileWriter("movimento.txt"));
-                writer.write(replay_cobra);
-                writer = new BufferedWriter(new FileWriter("biscoito.txt"));
-                writer.write(replay_biscoito);
+                writer = new BufferedWriter(new FileWriter("/home/timana/Documents/3 Semestre/FP/Trabalho Semestral/estatisticas.txt"));
+                writer.write(++num_jogos);
+                writer.newLine();
+                writer.write(scores+sco);
                 writer.close();
             } catch (IOException ex) {
                 Logger.getLogger(JogoDeCobra.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (sco > high && nivel == 0) {//store in file
                 highscore = score;
-                try {
-                  writer = new BufferedWriter(new FileWriter("highscore.txt"));
-                  writer.write(highscore);
-                  writer.close();
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(JogoDeCobra.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                }
                 g.setColor(fundo_cor);
                 g.fillRect(quadro_x+comp2+120,quadro_y-15,55,15);
                 g.setColor(Color.white);
                 g.drawString(highscore,quadro_x+comp2+120,quadro_y-larg);
+                try {
+                    writer = new BufferedWriter(new FileWriter("jogador.txt"));
+                    writer.write(highscore);
+                    writer.newLine();
+                    writer.write(replay_cobra);
+                    writer.newLine();
+                    writer.write(replay_biscoito);
+                    writer.newLine();
+                    writer.write(replay_obs_add);
+                    writer.newLine();
+                    writer.write(replay_obs_num);
+                    writer.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(JogoDeCobra.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             g.setColor(Color.green);
             //if (nivel == 0) {
@@ -1997,8 +2223,33 @@ public class JogoDeCobra extends JFrame {
         System.exit(0);
     }
 
+    @Override
+    public void keyTyped(KeyEvent k) {
+        System.out.println("entrou");
+        System.out.println(k.getKeyCode());
+        System.out.println("Aqui: "+(k.getKeyChar() == 32));
+        System.out.println(k.getKeyCode() == 32);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent k) {
+        System.out.println("entrou");
+        System.out.println(k.getKeyCode());
+        System.out.println("Aqui: "+(k.getKeyChar() == 32));
+        System.out.println(k.getKeyCode() == 32);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent k) {
+        System.out.println("entrou");
+        System.out.println(k.getKeyCode());
+        System.out.println("Aqui: "+(k.getKeyChar() == 32));
+        System.out.println(k.getKeyCode() == 32);
+    }
+    
     public static void main(String[] args) {
         //Menu menu = new Menu();
         JogoDeCobra jdc = new JogoDeCobra();
     }
+
 }

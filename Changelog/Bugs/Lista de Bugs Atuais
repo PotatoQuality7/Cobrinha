@@ -1,7 +1,3 @@
-Cobra:
-• Cobra impedida de disparar a cauda.
-• Cobra pára de se mover de repente.
-
 Níveis:
 • Boss não aparece no nível 7.
 
@@ -26,7 +22,7 @@ Efeitos:
 	• Portal:
 		• Não funciona.
 	• Fantasma:
-		• Não funciona.
+		• Não volta a desenhar a cobra caida.
 	• Kamikaze:
 		• Colisão com um obstáculo durante o ataque "Impacto" do Boss, causa a eliminação de obstáculos não adjacentes.
 		• Um dos segmentos da cobra continua com a cor da Cobra Kamikaze após impacto.
@@ -42,4 +38,6 @@ Efeitos:
 		• Mina leva muito tempo para explodir.
 
 Outros:
-• Jogo impedido de ser pausado.
+• Botão de pausa não pausa o seguinte:
+	• Obstáculos movidos pelo ataque Impacto do Boss.
+	• Temporizador dos Efeitos.

@@ -11,6 +11,9 @@ Biscoito:
 Obstáculos:
 • Gerados aleatóriamento no quadro.
 
+Menu:
+• Não funcional.
+
 Níveis:
 • Jogador pode selecionar níveis com características únicas.
 • Design do nível varia dependendo da dificuldade selecionada.
@@ -43,9 +46,9 @@ Boss:
     • Os Gêmeos:
         • Cobras gêmeas que nascem no quadro à partir de ovos lançados pelo Boss.
             • Ovos podem ser destruídos pelo ataque de arremesso da cauda do jogador.
-        • O primeiro gêmeo segue o biscoito.
-            • Consumo do biscoito aumenta o tamanho do gêmeo.
-        • Vulnerável ao mesmo tipo de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
+        • O primeiro gêmeo tenta encurralar o jogador.
+        • Consumo do biscoito aumenta o tamanho dos gêmeos.
+        • Vulneráveis ao mesmo tipo de dano que o jogador, com exceção dos ataques do Boss e dos Efeitos.
 
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
