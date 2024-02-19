@@ -4,10 +4,16 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -20,33 +26,36 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-public class Menu implements ActionListener {
+public class Menu implements ActionListener, KeyListener, MouseListener {
    
     JFrame frame;
     JPanel telaPrincipal, telaEstatisticas, telaReplay, telaMenor, telaModo;
     JButton newGame, loadGame, confirmarCadastro, easyButton, normalButton, hardButton, jogador1Button, jogador2Button, jogador3Button, niveisButton, continuoButton, multiplayerButton, estatisticasButton;
     JButton nivel1, nivel2, nivel3, nivel4, nivel5, nivel6, nivel7, nivel8, nivel9, nivel10, avancarButton, recuarButton, voltarContas, voltarNiveis, voltarModo, voltarEstatisticas, avancarEstatisticas;
+    JTextField scrollEstatisticas;
     JButton replay1, replay2, replay3;
     JButton nivelTest;
     JTextField usuarioField;
     JPasswordField senhaField;
     Icon icon;
     JLabel aviso, mainBorder, miniBorder, usuarioText, senhaText, dificuldade, niveisText;
+    Color fundo_cor = Color.black;
     Color cobra_cor = new Color(0,255,160);
     Color biscoito_cor = Color.yellow;
     Color obstaculo_cor = Color.red;
     
+    String tempStr;
     String[] jogadorNome = new String[4];
     String[] jogadorSenha = new String[4];
     String[] jogadorID = new String[4];
     String[] jogadorDificuldade = new String[4];
     byte[] jogadorNivel = new byte[4];
     
-    int inicio, fim, num_pontos = 0;
-    short quadro_x = 440, quadro_y = 120, pixel = 11, comp = 420, comp2 = 508, larg = 6, x = 20;
-    byte nivel, jogador, num_jogadores = 0;
+    int y, x, i, j, i2, j2, id, inicio, fim, num_pontos = 0;
+    short quadro_x = 440, quadro_y = 120, pixel = 11, comp = 420, comp2 = 508, larg = 6;
+    byte nivel, jogador, num_jogadores = 0, width, height;
     short tempShrt = 0;
-    boolean incompleto, colapso = false, expansao = false;
+    boolean iniciar_jogo = false, incompleto, colapso = false, expansao = false;
     
     float[] ponto_x = new float[2001];
     float[] ponto_y = new float[2001];
@@ -55,32 +64,15 @@ public class Menu implements ActionListener {
     short[] expansao_grupos = new short[101];
     String[] expansao_scores = new String[101];
     
-    
-    public String[] alternativa = new String[3];
-    public byte[][] cobra_x = new byte[4][301];
-    public byte[][] cobra_y = new byte[4][301];
-    public boolean[][] cobra, rival, cobra_caida, escolha, livre, obstaculo_movido;
-    public short[] cobra_tamanho;
-    public byte alvo_y, alvo_x;
-    byte width = 30;
-    byte height = 30;
-    public byte[][] obstaculo_direcao;
-    public int i, i2, j, j2, sco, tempInt, y;
-    public Color fundo_cor = Color.black;
-    public boolean[][] obstaculo;
-    public byte[][] obstaculo_grupo;
-    
-    
-    public byte[] rival_y = new byte[61];
-    public byte[] rival_x = new byte[61];
-    public byte[] prioridade = new byte[5];
-    public byte[] check_y = new byte[61];
-    public byte[] check_x = new byte[61];
-    public byte[] check_direcao = new byte[61];
-    public boolean[][] check_invalido = new boolean[61][5];
-    public boolean[][] checkpoint;
-    public byte biscoito_y, biscoito_x, num_check, anterior, atual, pos_y, pos_x, inicio_y, inicio_x, fim_y, rival_direcao, rival_anterior, rival_tamanho;
-    public boolean rival_desistiu, rival_derrotado, permissao;
+    public boolean[][] rival, livre, obstaculo, checkpoint, check_invalido;
+    public boolean[] rival_derrotado;
+    public byte[][] rival_y, rival_x;
+    public byte[] rival_direcao, prioridade, check_y, check_x, check_direcao;
+    public short[] rival_tamanho;
+    public boolean permissao, rival_desistiu, cobra_redonda;
+    public byte num_check, rival_anterior, atual, anterior, biscoito_y, biscoito_x, inicio_x, inicio_y, fim_y;
+    public byte pos_y, pos_x, alvo_y, alvo_x, num_rivais, cobra_pixel;
+    int c;
         
     public Menu() {
         
@@ -95,14 +87,8 @@ public class Menu implements ActionListener {
         telaPrincipal.setBounds(400,100,600,500);
         telaPrincipal.setBorder(BorderFactory.createMatteBorder(5,5,5,5,Color.black));
         telaPrincipal.setBackground(new Color(188,158,130));
-        telaPrincipal.setLayout(null);  
-        
-        telaEstatisticas = new JPanel();
-        telaEstatisticas.setBounds(0,0,600,500);
-        telaEstatisticas.setBorder(BorderFactory.createMatteBorder(5,5,5,5,Color.black));
-        telaEstatisticas.setBackground(new Color(188,158,130));
-        telaEstatisticas.setLayout(null);  
-        
+        telaPrincipal.setLayout(null);
+                
         telaReplay = new JPanel();
         telaReplay.setBounds(0,0,600,500);
         telaReplay.setBorder(BorderFactory.createMatteBorder(5,5,5,5,Color.black));
@@ -133,9 +119,60 @@ public class Menu implements ActionListener {
         telaMenor.setBounds(100,100,400,300);
         telaMenor.setLayout(null);
         
-        
         jogadorNome[1] = "Bob";
         jogadorNivel[1] = 1;
+        
+        
+        telaEstatisticas = new JPanel();
+        telaEstatisticas.setBounds(0,0,600,800);
+        telaEstatisticas.setBorder(BorderFactory.createMatteBorder(5,5,5,5,Color.black));
+        telaEstatisticas.setBackground(new Color(0, 51, 51));
+        telaEstatisticas.setLayout(null);
+        telaEstatisticas.addKeyListener(this);
+        
+        JLabel estatisticasText = new JLabel("Estatisticas");
+        estatisticasText.setBounds(100,50,100,100);
+        estatisticasText.setForeground(Color.white);
+        telaEstatisticas.add(estatisticasText);
+        JLabel estatisticasText2 = new JLabel("Ela tinha corpo de pera maca");
+        estatisticasText2.setBounds(100,600,100,100);
+        estatisticasText2.setForeground(Color.white);
+        telaEstatisticas.add(estatisticasText2);
+        icon = new ImageIcon("recuar.png");
+        voltarEstatisticas = new JButton(icon);
+        voltarEstatisticas.setBounds(15,245,52,40);
+        voltarEstatisticas.setBackground(null);
+        voltarEstatisticas.addActionListener(this);
+        telaEstatisticas.add(voltarEstatisticas);
+        icon = new ImageIcon("avancar.png");
+        avancarEstatisticas = new JButton(icon);
+        avancarEstatisticas.setBounds(550,245,52,40);
+        avancarEstatisticas.setBackground(null);
+        avancarEstatisticas.addActionListener(this);
+        scrollEstatisticas = new JTextField();
+        scrollEstatisticas.setBounds(200,205,52,40);
+        scrollEstatisticas.addKeyListener(this);
+        scrollEstatisticas.addMouseListener(this);
+        
+        telaEstatisticas.add(scrollEstatisticas);
+        i = 0;
+        width = 17;
+        height = 17;
+        rival = new boolean[height+2][width+2];
+        rival_y = new byte[28][301];
+        rival_x = new byte[28][301];
+        rival_tamanho = new short[28];
+        rival_direcao = new byte[28];
+        rival_derrotado = new boolean[2];
+        check_invalido = new boolean[61][5];
+        check_direcao = new byte[61];
+        check_y = new byte[61];
+        check_x = new byte[61];
+        checkpoint = new boolean[height+2][width+2];
+        prioridade = new byte[5];
+        livre = new boolean[height+2][width+2];
+        obstaculo = new boolean[height+2][width+2];
+        frame.repaint();
     }
     
     public void enviarInformacoes() {
@@ -152,6 +189,13 @@ public class Menu implements ActionListener {
     
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == scrollEstatisticas) {
+            /*i += 10;
+            telaEstatisticas.setBounds(0,0-i,600,700);
+            telaPrincipal.add(telaEstatisticas);
+            frame.repaint();*/
+            
+        }
         if (e.getSource() == voltarContas) {
             frame.dispose();
             new Menu();
@@ -302,7 +346,7 @@ public class Menu implements ActionListener {
              frame.repaint();
              niveisButton = new JButton("Niveis");
              continuoButton = new JButton("Modo Continuo");
-             icon = new ImageIcon("/home/timana/Documents/3 Semestre/FP/Trabalho Semestral/Estatisticas.png");
+             icon = new ImageIcon("./Arte/Estatisticas.png");
              estatisticasButton = new JButton(icon);
              //multiplayerButton = new JButton("Multiplayer");
              niveisButton.setBounds(80,50,250,60);
@@ -508,6 +552,7 @@ public class Menu implements ActionListener {
                     }
                 }
             };
+            nivel1.addMouseListener(this);
             nivel1.addActionListener(this);
             nivel2.addActionListener(this);
             nivel3.addActionListener(this);
@@ -705,22 +750,6 @@ public class Menu implements ActionListener {
         }
         if (e.getSource() == estatisticasButton) {
             telaPrincipal.removeAll();
-            JLabel estatisticasText = new JLabel("Estatisticas");
-            estatisticasText.setBounds(100,50,100,100);
-            estatisticasText.setForeground(Color.white);
-            telaEstatisticas.add(estatisticasText);
-            icon = new ImageIcon("recuar.png");
-            voltarEstatisticas = new JButton(icon);
-            voltarEstatisticas.setBounds(15,245,52,40);
-            voltarEstatisticas.setBackground(null);
-            voltarEstatisticas.addActionListener(this);
-            telaEstatisticas.add(voltarEstatisticas);
-            icon = new ImageIcon("avancar.png");
-            avancarEstatisticas = new JButton(icon);
-            avancarEstatisticas.setBounds(550,245,52,40);
-            avancarEstatisticas.setBackground(null);
-            avancarEstatisticas.addActionListener(this);
-            telaEstatisticas.add(avancarEstatisticas);
             telaPrincipal.add(telaEstatisticas);
             frame.repaint();
         }
@@ -728,10 +757,11 @@ public class Menu implements ActionListener {
         if (e.getSource() == avancarEstatisticas) {
             telaPrincipal.remove(telaEstatisticas);
             quadro_x = 80; quadro_y = 100;
+            JogoDeCobra jdc = new JogoDeCobra();
             replay1 = new JButton() {
                 @Override    
                 protected void paintComponent(Graphics g) {
-                    replay(g);
+                    jdc.replay(g);
                 }
             };
             replay1.setBounds(quadro_x,quadro_y,140,140);
@@ -740,104 +770,6 @@ public class Menu implements ActionListener {
             frame.repaint();
         }
           
-    }
-    
-    public void replay(Graphics g) {
-        int ciclos = 0, biscoito_c = 0, obs_num_c = 0, tamanho = 7, obs_add_c = 0;
-        byte pos = 0;
-        String highscore = "", tempStr = "", direcoes = "", biscoitos = "", obs_add = "", obs_num = "";
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("/home/timana/Documents/3 Semestre/FP/Trabalho Semestral/jogador.txt"));
-            highscore = reader.readLine();
-            direcoes = reader.readLine();
-            ciclos = direcoes.length();
-            biscoitos = reader.readLine();
-            obs_add = reader.readLine();
-            obs_num = reader.readLine();
-            reader.close();
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        g.setColor(cobra_cor);
-        pos = 4;
-        for (i = 7; i >= 1; i--) {
-            cobra_x[0][i] = pos++;
-            cobra_y[0][i] = 5;
-            x = cobra_x[0][i];
-            g.fillRect((x-1)*11,4*11,11,11);
-            System.out.println("cobra_y: "+cobra_y[0][i]+", cobra_x: "+cobra_x[0][i]);
-        }
-        System.out.println("highscore: "+highscore);
-        System.out.println("direcoes: "+direcoes);
-        System.out.println("biscoitos: "+biscoitos);
-        System.out.println("obs_add: "+obs_add);
-        System.out.println("obs_num: "+obs_num);
-        biscoito_y = Byte.parseByte(biscoitos.substring(biscoito_c,biscoito_c+2));
-        biscoito_x = Byte.parseByte(biscoitos.substring(biscoito_c+2,biscoito_c+4));
-        
-        biscoito_c += 4;
-        y = biscoito_y; x = biscoito_x;
-        g.setColor(biscoito_cor);
-        g.fillOval((x-1)*11,(y-1)*11,10,10);
-        
-        for (i = 0; i < 10; i++) {
-            System.out.println("i: "+i);
-            cobra_y[0] = cobra_y[1];
-            cobra_x[0] = cobra_x[1];
-            switch (direcoes.charAt(i)) {
-                case 119: {cobra_y[0][0] = (byte) (cobra_y[0][1] - 1);//W
-                           cobra_x[0][0] = cobra_x[0][1];
-                           break;}
-                case 97: {cobra_x[0][0] = (byte) (cobra_x[0][1] - 1);//A
-                          cobra_y[0][0] = cobra_y[0][1];
-                          break;}
-                case 115: {cobra_y[0][0] = (byte) (cobra_y[0][1] + 1);//S
-                           cobra_x[0][0] = cobra_x[0][1];
-                           break;}
-                case 100: {cobra_x[0][0] = (byte) (cobra_x[0][1] + 1);//D
-                           cobra_y[0][0] = cobra_y[0][1];
-                           break;}
-            }
-            g.setColor(fundo_cor);
-            x = cobra_x[0][tamanho]; y = cobra_y[0][tamanho];
-            g.fillRect((x-1)*11,(y-1)*11,11,11);
-            for (j = (byte) (tamanho-1); j >= 0; j--) {
-                cobra_x[0][j+1] = cobra_x[0][j];
-                cobra_y[0][j+1] = cobra_y[0][j];
-            }
-            System.out.println("cobra_y[0]: "+cobra_y[0][1]+", cobra_x[0]: "+cobra_x[0][1]);
-            //System.out.println("biscoito_y: "+biscoito_y+", biscoito_x: "+biscoito_x);
-            g.setColor(cobra_cor);
-            x = cobra_x[0][1]; y = cobra_y[0][1];
-            g.fillRect((x-1)*11,(y-1)*11,11,11);
-            if (y == biscoito_y && x == biscoito_x) {
-                //System.out.println("biscoito_y: "+biscoito_y+", biscoito_x: "+biscoito_x);
-                //System.out.println(biscoito_y+""+biscoito_x);
-                biscoito_y = Byte.parseByte(biscoitos.substring(biscoito_c,biscoito_c+2));
-                biscoito_x = Byte.parseByte(biscoitos.substring(biscoito_c+2,biscoito_c+4));
-                tamanho++;
-                biscoito_c += 4;
-                y = biscoito_y; x = biscoito_x;
-                g.setColor(biscoito_cor);
-                g.fillOval((x-1)*11,(y-1)*11,10,10);
-                g.setColor(obstaculo_cor);
-                tempInt = Integer.parseInt(obs_num.substring(obs_num_c,obs_num_c+1));
-                for (j = 0; j <= tempInt; j++) {
-                    y = Byte.parseByte(obs_add.substring(obs_add_c,obs_add_c+2));
-                    x = Byte.parseByte(obs_add.substring(obs_add_c+2,obs_add_c+4));
-                    g.fillRect((x-1)*11,(y-1)*11,11,11);
-                    //System.out.println(y+""+x);
-                    obs_add_c += 4;
-                }
-                tempStr = "";
-                for (j = biscoito_c; j < biscoitos.length(); j++)
-                    tempStr += biscoitos.charAt(j);
-                //for (j = obs_add_c; j < obs_add.length(); j++)
-                //    tempStr += obs_add.charAt(j);
-                System.out.println("\n"+tempStr+"\n");
-                obs_num_c++;
-            }
-        }
     }
     
     public void comecarScores(Graphics g) {
@@ -983,7 +915,6 @@ public class Menu implements ActionListener {
     }
   
     public void expandirPonto(Graphics g) {
-        String tempStr;
         num_pontos = 0;
         inicio = 1;
         for (i = 1; i <= i2; i++)
@@ -1015,11 +946,210 @@ public class Menu implements ActionListener {
     }
     
     public static void main(String[] args) {
-        //Menu menu = new Menu();
-        Menu menu = new Menu();
+        new Menu();
+    }
+
+    @Override
+    public void keyTyped(KeyEvent k) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent k) {
+        if (k.getKeyCode() == 40) {
+            System.out.println("Hello");
+        }
+        if (k.getKeyCode() == 40 && i != -200) {
+            i -= 10;
+            telaEstatisticas.setBounds(0,0+i,600,700);
+            scrollEstatisticas.setBounds(200,205-i,52,40);
+            frame.repaint();
+            System.out.println(i);
+        }
+        if (k.getKeyCode() == 38 && i != 0) {
+            i += 10;
+            telaEstatisticas.setBounds(0,0+i,600,700);
+            scrollEstatisticas.setBounds(200,205-i,52,40);
+            frame.repaint();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent k) {
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent m) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mousePressed(MouseEvent m) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent m) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void algo(Graphics g) {
+        g.setColor(Color.green);
+        g.fillRect(0,0,200,200);
     }
     
-}/*
+    TimerTask tt;
+    boolean iniciado = false;
+    @Override
+    public void mouseEntered(MouseEvent m) {
+        if (m.getSource() == nivel1) {
+            telaPrincipal.remove(nivel1);
+            Timer t = new Timer();
+            width = 17;
+            height = 17;
+            num_rivais = 1;
+            quadro_y = 0;
+            quadro_x = 0;
+            cobra_pixel = 8;
+            pixel = 8;
+            rival_direcao[1] = 1;
+            String algo = "";
+            for (i = 0; i <= height+1; i++)
+              for (j = 0; j <= width+1; j++) {
+                 if (i == 0 || i == height+1 || j == 0||j == width+1 || obstaculo[i][j] == true)
+                    livre[i][j] = false;
+                  else
+                    livre[i][j] = true;
+              }      
+            System.out.println("'"+rival_tamanho[0]+"'");
+            System.out.println("'"+rival_tamanho[0]+"'");
+            biscoito_y = 16;
+            biscoito_x = 15;
+            id = 1;
+            tt = new TimerTask() {
+                @Override 
+                public void run() {
+                    nivel1 = new JButton() {
+                        @Override    
+                        protected void paintComponent(Graphics g) {
+                            if (iniciado == false) {
+                                iniciarRival(g);
+                                iniciado = true;
+                            }
+                            id = 1;
+                            g.setColor(fundo_cor);
+                            g.fillRect(quadro_x,quadro_y,140,140);
+                            moverRival(g, cobra_cor);
+                            g.setColor(cobra_cor);
+                            for (i = 1; i <= rival_tamanho[1]; i++)
+                                g.fillRect(quadro_x+((rival_x[1][i]-1)*pixel),quadro_y+((rival_y[1][i]-1)*pixel),cobra_pixel, cobra_pixel);
+                            if (rival[biscoito_y][biscoito_x] == true)
+                                do {
+                                    biscoito_y = (byte) ((Math.random() * (height-2)) + 2);
+                                    biscoito_x = (byte) ((Math.random() * (width-2)) + 2);
+                                } while (livre[biscoito_y][biscoito_x] == false);
+                            if (rival_derrotado[1] == true) 
+                                tt.cancel();
+                            g.setColor(biscoito_cor);
+                            g.fillRect(quadro_x+((biscoito_x-1)*pixel),quadro_y+((biscoito_y-1)*pixel),cobra_pixel-3, cobra_pixel-3);
+                            System.out.println("rival_y: "+rival_y[1][1]+", rival_x: "+rival_x[1][1]);
+                            System.out.println("biscoito_y: "+biscoito_y+", biscoito_x: "+biscoito_x);
+                            System.out.println("tamanho: "+rival_tamanho[1]);
+                            System.out.println("derrotado: "+rival_derrotado[1]);
+                        }
+                    };
+                    nivel1.setBounds(40,100,140,140);
+                    telaPrincipal.add(nivel1);
+                    frame.repaint();
+                }
+            };t.schedule(tt,0,1000);
+        }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent m) {
+        if (m.getSource() == scrollEstatisticas) {
+            System.out.println("Saiu");
+            tt.cancel();
+            
+        }
+    }
+    //Deletar depois
+    public String pergunta, boss_ataque_tipo;
+    boolean[][] boss_ataque;
+                           
+    public float duplicador, boss_impacto_velocidade;
+    public Color rival_cor1 = Color.red;
+    public Color rival_cor2 = Color.orange;
+    public Color minas_cor = Color.red;
+    public Color boss_ataque_laser_cor = Color.red;
+    public Color boss_ataque_perfurador_cor = new Color(255,255,127);
+    //public Color boss_ataque_refletidor_cor = Color.orange;
+    public Color boss_ataque_refletor_cor1 = Color.orange;
+    public Color boss_ataque_refletor_cor2 = Color.white;
+    public Color boss_ataque_beam_cor1 = Color.white;
+    public Color boss_ataque_beam_cor2 = new Color(255,255,127);
+    public Color cobra_tiro_cor = new Color(185,170,227);
+    
+    public void iniciarRival(Graphics g) {
+        if (iniciar_jogo == false) {
+            c = cobra_pixel;
+            if (iniciado == false) {    
+                y = 5; 
+                x = 12;
+            }
+            else
+              do {
+                  y = (byte) ((Math.random() * height) + 1);
+                  x = (byte) ((Math.random() * width) + 1);
+              } while (livre[y][x] == false);
+            if (id == 0)
+                g.setColor(rival_cor1);
+             else
+               g.setColor(rival_cor2);
+            livre[y][x] = false;
+            rival[y][x] = true;
+            rival_y[id][1] = (byte) y;
+            rival_x[id][1] = (byte) x;
+            g.fillRect(quadro_x+((x-1)*pixel),quadro_y+((y-1)*pixel),c,c);
+            rival_tamanho[id] = 7;
+        }
+        else {
+          for (id = 1; id <= 2; id++) {
+              switch (id) {
+                  case 1 -> rival_tamanho[id] = 26; //S
+                  case 2,21 -> rival_tamanho[id] = 20; //N
+                  case 3,12,19 -> rival_tamanho[id] = 15; //A1
+                  case 4,13,20 -> rival_tamanho[id] = 15; //A2
+                  case 5 -> rival_tamanho[id] = 15; //K1
+                  case 6 -> rival_tamanho[id] = 15; //K2
+                  case 7 -> rival_tamanho[id] = 15; //K3
+                  case 8,16,26 -> rival_tamanho[id] = 15; //E1
+                  case 9,17,27 -> rival_tamanho[id] = 15; //E2
+                  case 10,11 -> rival_tamanho[id] = 15; //:
+                  case 14 -> rival_tamanho[id] = 15; //R1
+                  case 15 -> rival_tamanho[id] = 15; //R2
+                  case 18 -> rival_tamanho[id] = 15; //V
+                  case 22 -> rival_tamanho[id] = 15; //C
+                  case 23 -> rival_tamanho[id] = 15; //H1
+                  case 24 -> rival_tamanho[id] = 15; //H2
+                  case 25 -> rival_tamanho[id] = 15; //H3
+              }
+              tempShrt = (short)((Math.random()*80)+1);
+              if (tempShrt >= 5) {//x extremo
+                  rival_y[id][1] = (byte) tempShrt;
+                  rival_x[id][1] = (byte)(Math.random()*10) >= 5? (byte) 420 : 0; 
+              }
+              else {
+                  rival_x[id][1] = (byte) tempShrt;
+                  rival_y[id][1] = (byte)(Math.random()*10) >= 5? (byte) 280 : 0; 
+              }
+              rival_direcao[id] = rival_x[id][1] == width? (byte) 1 : 3;
+              System.out.println(rival_y[id][1]+"  "+rival_x[id][1]);   
+          }
+        }
+            
+    }
+    
     public void metaHorizontal() {
         if (alvo_x > pos_x) {
             i2++;
@@ -1042,32 +1172,53 @@ public class Menu implements ActionListener {
     }
     
     public void checkpointReiniciar(Graphics g,boolean[][] rival) {
-        for (int i = 0; i <= num_check; i++)
-            for (int j = 0; j <= 4; j++)
+        for (i = 0; i <= num_check; i++)
+            for (j = 0; j <= 4; j++)
                check_invalido[i][j] = false;
         for (i = 1; i <= height; i++)
             for (j = 1; j <= width; j++) 
                 if (checkpoint[i][j] == true)
                     checkpoint[i][j] = false;
         num_check = 0;
-        check_y[0] = rival_y[1];
-        check_x[0] = rival_x[1];
+        check_y[0] = rival_y[id][1];
+        check_x[0] = rival_x[id][1];
         //check_invalido[0][atual < 3? atual+2 : atual-2] = true;
         permissao = true;
         rival_desistiu = false;
-        check_direcao[0] = rival_direcao;
-        atual = rival_direcao;
-        pos_x = (byte) rival_x[1];
-        pos_y = (byte) rival_y[1];
-        alvo_y = cobra_y[0][0];
-        alvo_x = cobra_x[0][0];
-        g.setColor(Color.orange);
-        //System.out.println(cobra_x[0][0]);
-        //System.out.println(cobra_x[0][1]);
-        //if (livre[alvo_y][alvo_x] == true && checkpoint[alvo_y][alvo_x] == false)
-        //  g.drawString("T",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));
-       //else
-        // g.drawString("F",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));
+        rival_anterior = rival_direcao[id];
+        check_direcao[0] = rival_direcao[id];
+        atual = rival_direcao[id];
+        pos_y = (byte) rival_y[id][1];
+        pos_x = (byte) rival_x[id][1];
+        /*if (iniciar_jogo == true) {
+            alvo_y = alvo_y2[id][alvo_c[id]];
+            alvo_x = alvo_x2[id][alvo_c[id]];
+        }
+        else {*/
+            /*if (id == 0) {
+                alvo_y = cobra_y[0][0];
+                alvo_x = cobra_x[0][0];
+                if ((abs(pos_y-cobra_y[0][1]) > 1))
+                    alvo_y += cobra_y[0][0]-cobra_y[0][1];
+                 else
+                   if (abs(pos_x-cobra_x[0][1]) > 1) {
+                       alvo_x += cobra_x[0][0]-cobra_x[0][1];
+                }
+                g.setColor(Color.red);
+            }
+            else {*/
+              alvo_y = biscoito_y;
+              alvo_x = biscoito_x;  
+              g.setColor(Color.orange);
+            /*}
+        }*/
+        System.out.println("percebido: y: "+alvo_y+", x: "+alvo_x);
+        /*System.out.println(cobra_x[0][0]);
+        System.out.println(cobra_x[0][1]);
+        if (livre[alvo_y][alvo_x] == true && checkpoint[alvo_y][alvo_x] == false)
+          g.drawString("T",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));
+       else
+         g.drawString("F",quadro_x+((alvo_x-1)*11),quadro_y+(alvo_y*11));*/
     }
           
   public void moverRival(Graphics g, Color rival_cor) {
@@ -1082,13 +1233,15 @@ public class Menu implements ActionListener {
                 metaHorizontal();
                 metaVertical();
             }
+            if (iniciar_jogo == true)
+                break;
             if (i2 == 0 || rival_desistiu == true)
                 break;
             else {
               if ((anterior % 2 == 0 && i2 == 2) || (i2 == 1 && prioridade[1] % 2 == 1))
-                  prioridade[4] = alvo_x > rival_x[1]? (byte) 3 : 1;
+                  prioridade[4] = alvo_x > rival_x[id][1]? (byte) 3 : 1;
                else
-                 prioridade[4] = alvo_y < rival_y[1]? (byte) 4 : 2;
+                 prioridade[4] = alvo_y < rival_y[id][1]? (byte) 4 : 2;
               for (j = 1; j <= 4; j++) {
                   if (j != prioridade[1] && (j != prioridade[2] || i2 < 2) && j != prioridade[4]) {
                       i2++;
@@ -1101,13 +1254,13 @@ public class Menu implements ActionListener {
               atual = 0;
               for (j = 1; j <= 4; j++) {
                   //refazer a parte do check_invalido
-                  if (prioridade[j] == 1 && checkpoint[y][x+1] == false && (livre[y][x+1] == true || (y == biscoito_y && x+1 == biscoito_x)) && anterior != 3 && (check_invalido[num_check][1] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
+                  if (prioridade[j] == 1 && checkpoint[y][x+1] == false&& (livre[y][x+1] == true || (y == biscoito_y && x+1 == biscoito_x)) && anterior != 3 && (check_invalido[num_check][1] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
                       pos_x++; atual = 1;
                       break;}
                   if (prioridade[j] == 2 && checkpoint[y-1][x] == false && (livre[y-1][x] == true || (y-1 == biscoito_y && x == biscoito_x)) && anterior != 4 && (check_invalido[num_check][2] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
                       pos_y--; atual = 2;
                       break;}
-                  if (prioridade[j] == 3 && checkpoint[y][x-1] == false && (livre[y][x-1] == true || (y == biscoito_y && x-1 == biscoito_x)) && anterior != 1 && (check_invalido[num_check][3] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
+                  if (prioridade[j] == 3 && checkpoint[y][x-1] == false  && (livre[y][x-1] == true || (y == biscoito_y && x-1 == biscoito_x)) && anterior != 1 && (check_invalido[num_check][3] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
                       pos_x--; atual = 3;
                       break;}
                   if (prioridade[j] == 4 && checkpoint[y+1][x] == false && (livre[y+1][x] == true || (y+1 == biscoito_y && x == biscoito_x)) && anterior != 2 && (check_invalido[num_check][4] == false || pos_x != check_x[num_check] || pos_y != check_y[num_check])) {
@@ -1116,7 +1269,7 @@ public class Menu implements ActionListener {
               }
               checkpoint[y][x] = true;
               if (permissao == true && atual != 0) {
-                  rival_direcao = atual;
+                  rival_direcao[id] = atual;
                   permissao = false;
               }
               if (anterior != atual && atual != 0) {
@@ -1131,14 +1284,29 @@ public class Menu implements ActionListener {
                   if (check_y[1] != check_y[0] || check_x[1] != check_x[0])
                       num_check++;
                   check_direcao[num_check] = atual;
-                  if (abs(rival_x[1]-pos_x) <= 1 && atual % 2 == 0) {
+                  if (abs(rival_x[id][1]-pos_x) <= 1 && atual % 2 == 0) {
                       inicio_x = pos_x;
-                      inicio_y = rival_y[1]; fim_y = pos_y;
+                      inicio_y = rival_y[id][1]; fim_y = pos_y;
                   }
               }
               else {
                 y = pos_y; x = pos_x;
-                if (atual != 0 && (y != rival_y[1] || x != rival_x[1]) && ((obstaculo[y-1][x-1] == true && obstaculo[y-1][x] == false && obstaculo[y-1][x+1] == true) || (obstaculo[y-1][x+1] == true && obstaculo[y][x+1] == false && obstaculo[y+1][x+1] == true) || (obstaculo[y+1][x+1] == true && obstaculo[y+1][x] == false && obstaculo[y+1][x-1] == true) || (obstaculo[y+1][x-1] == true && obstaculo[y][x-1] == false && obstaculo[y-1][x-1] == true))) {
+                System.out.println("id: "+id);
+                System.out.println("y: "+pos_y+", x: "+pos_x);
+                if (atual != 0 && (y != rival_y[id][1] || x != 
+                        rival_x[id][1]) && 
+                        ((obstaculo[y-1][x-1] == true && 
+                        obstaculo[y-1][x] == false && 
+                        obstaculo[y-1][x+1] == true) || 
+                        (obstaculo[y-1][x+1] == true && 
+                        obstaculo[y][x+1] == false && 
+                        obstaculo[y+1][x+1] == true) || 
+                        (obstaculo[y+1][x+1] == true && 
+                        obstaculo[y+1][x] == false && 
+                        obstaculo[y+1][x-1] == true) || 
+                        (obstaculo[y+1][x-1] == true && 
+                        obstaculo[y][x-1] == false && 
+                        obstaculo[y-1][x-1] == true))) {
                     num_check++;
                     check_y[num_check] = pos_y;
                     check_x[num_check] = pos_x;
@@ -1171,117 +1339,60 @@ public class Menu implements ActionListener {
               }
             }
         }
-        rival_y[0] = rival_y[1];
-        rival_x[0] = rival_x[1];
-        switch (rival_direcao) {
-            case 1 -> rival_x[0]++;
-            case 2 -> rival_y[0]--;
-            case 3 -> rival_x[0]--;
-            case 4 -> rival_y[0]++;
+        if (iniciar_jogo == true)
+            rival_direcao[id] = prioridade[1];
+        System.out.println("prior: "+prioridade[1]);
+        rival_y[id][0] = rival_y[id][1];
+        rival_x[id][0] = rival_x[id][1];
+        switch (rival_direcao[id]) {
+            case 1 -> rival_x[id][0]++;
+            case 2 -> rival_y[id][0]--;
+            case 3 -> rival_x[id][0]--;
+            case 4 -> rival_y[id][0]++;
         }
-        x = rival_x[0]; y = rival_y[0];
+        System.out.println("dir: "+rival_direcao[id]);
+        System.out.println("Pos: "+rival_y[id][0]+" "+rival_x[id][0]);
+        x = rival_x[id][0]; y = rival_y[id][0];
+        if (iniciar_jogo == true) {
+            y = 0; x = 0;
+        }
         if (livre[y][x] == false && (y != biscoito_y || x != biscoito_x))
-            rival_derrotado = true;
-        else {
-            x = rival_x[rival_tamanho]; y = rival_y[rival_tamanho];
-            livre[y][x] = true;
-            rival[y][x] = false;
-            g.setColor(fundo_cor);
-            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
-            for (i = (byte) (rival_tamanho-1); i >= 0; i--) {
-                rival_x[i+1] = rival_x[i];
-                rival_y[i+1] = rival_y[i];
+            rival_derrotado[id] = true;                
+         else {
+            x =  rival_x[id][rival_tamanho[id]]; y = rival_y[id][rival_tamanho[id]];
+            if (iniciar_jogo == false) {
+                livre[y][x] = true;
+                rival[y][x] = false;
             }
-            x = rival_x[1]; y = rival_y[1];
-            livre[y][x] = false;
-            rival[y][x] = true;
-            g.setColor(rival_cor);
-            g.fillRect(quadro_x+((x-1)*11),quadro_y+((y-1)*11),11,11);
+            g.setColor(fundo_cor);
+            g.fillRect(quadro_x+((x-1)*pixel),quadro_y+((y-1)*pixel),c,c);
+            for (i = (byte) (rival_tamanho[id]-1); i >= 0; i--) {
+                rival_x[id][i+1] = rival_x[id][i];
+                rival_y[id][i+1] = rival_y[id][i];
+            }
+            x = rival_x[id][1]; y = rival_y[id][1];
+            if (iniciar_jogo == false) {
+                livre[y][x] = false;
+                rival[y][x] = true;
+            }
+            if (id == 0)
+                g.setColor(rival_cor1);
+             else
+               g.setColor(rival_cor2);
+            if (cobra_redonda == false)
+                g.fillRect(quadro_x+((x-1)*pixel),quadro_y+((y-1)*pixel),c,c);
+             else
+               g.fillOval(quadro_x+((x-1)*pixel),quadro_y+((y-1)*pixel),c,c); 
+            if (y == biscoito_y && x == biscoito_x && iniciar_jogo == false) {
+                rival_y[0][++rival_tamanho[0]] = rival_y[0][rival_tamanho[0]-1];
+                rival_x[0][rival_tamanho[0]] = rival_x[0][rival_tamanho[0]-1];
+                rival_y[1][++rival_tamanho[1]] = rival_y[1][rival_tamanho[1]-1];
+                rival_x[1][rival_tamanho[1]] = rival_x[1][rival_tamanho[1]-1];
+                //rival_biscoitos_comidos++;
+                //rival_comeu = true;
+            }
         }    
             
-    }    
-    public void algo(Graphics g) {
-        g.setColor(Color.blue);
-        g.fillRect(quadro_x,quadro_y,200,200);
     }
     
-    public void enviarInformacoes() {
-        JogoDeCobra jdc = new JogoDeCobra();
-        jdc.receberInformacoes(jogadorDificuldade[jogador], nivel);
-        frame.dispose();
-    }
-/*Niveis
-public Menu() {
-        JFrame frame = new JFrame("Menu");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new TestPane());
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    }
-
-    public class TestPane extends JPanel implements ActionListener {
-
-        JButton b, c;
-        JPanel d;
-        Timer t;
-        boolean iniciado;
-        MiniTelas mini = new MiniTelas();
-        
-        public TestPane() {
-            setBackground(Color.white);
-            setLayout(null);  
-            b = new JButton("Enter");
-            add(b);
-            c = new JButton("Buenas");
-            c.setBounds(50,50,150,150);
-            c.addActionListener(this);
-            c.setForeground(Color.black);
-            d = new JPanel();
-            d.setBounds(50,50,150,150);
-            d.setBackground(Color.black);
-            add(c);
-            add(d);
-            t = new Timer();
-            iniciado = false;
-        }
-
-        @Override
-        public Dimension getPreferredSize() {
-            return new Dimension(800,800);
-        }
-
-        @Override
-        public void paintComponent(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g.create();
-            super.paintComponent(g);
-            short quadro_x, quadro_y;
-            quadro_x = 0; quadro_y = 0;
-            for (byte id = 1; id <= 6; id++) {
-                quadro_y = id <= 3? (short) 150 : 350;
-                switch (id) {   
-                    case 1,4 -> quadro_x = 200;
-                    case 2,5 -> quadro_x = 400;
-                    case 3,6 -> quadro_x = 600;
-                }
-                if (iniciado == false)
-                    mini.iniciarCobra(g, id, quadro_x, quadro_y);
-                mini.moverRival(g,id,quadro_x,quadro_y);
-            }
-            iniciado = true;
-            repaint();
-            paint(g);
-        }
-        
-        @Override
-        public void paint(Graphics g) {
-           paintComponent(g);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == c) {
-                System.out.println("Hey baby");
-            }
-        }
-*/
+}

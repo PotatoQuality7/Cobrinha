@@ -1,0 +1,15 @@
+Efeitos:
+• Ao esgotar, o temporizador transborda a barra.
+• Efeitos Benéficos:
+    • Pontuador:
+        • Aumenta os pontos, mas não atualiza no quadro.
+	• Multiplicador de Pontos:
+        • Não ativa.
+	• Portal:
+        • Não funciona.
+
+• Efeitos Prejudiciais:
+    • Redutor:
+        • Reduz os pontos, mas não atualiza no quadro.
+ 	• Divisor de Pontos:
+        • Não ativa.

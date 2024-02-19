@@ -5,11 +5,12 @@ Menu:
 • Permitirá a criação, remoção e modificação, e a leitura de um conta.
 • Permitirá a seleção entre os modos Single-Player e Multi-Player.
 • Permitirá a seleção entre os modos Infinito e Campanha.
+• Permitirá a seleção de níveis no modo Campanha.
 • Terá uma enciclopédia sobre as entidades do jogo.
 • Permitirá customização do jogo.
-	• Inclui mudança de cores, dos volumes de música e som.
+	• Incluirá a mudança de cores, dos volumes de música e som.
 • Permitirá o acesso aos replays.
-• Terá um LeaderBoard para poder visualizar os melhores recordes pessoais.
+• Terá um Leaderboard para poder visualizar os melhores recordes pessoais.
 
 Níveis:
 • Níveis serão desbloqueáveis ao longo do progresso.
@@ -23,9 +24,6 @@ Boss:
 		• Herdará as características do Laser Básico.
 		• Será capaz de desviar e esquivar blocos para atingir o jogador.
 		• Número limite de desvio variará dependendo da dificuldade.
-
-    • Os Gêmeos
-        • O segundo gêmeo seguirá o biscoito.
 
 Efeitos:
 • Modificadores benéficos ou prejudiciais do jogo.
